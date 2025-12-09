@@ -1,13 +1,21 @@
 <a class="bookmarklet"
    href="javascript:(function(){
-/* ---------- 1️⃣ abort if we are not on the exact Clickedu page ---------- */
+/* ---------- check if button already exists ---------- */
+let existingBtn = document.getElementById('clickeduOverlayBtn');
+if(existingBtn){
+    existingBtn.remove(); // hide/remove button
+    return;
+}
+
+/* ---------- abort if not on exact Clickedu page ---------- */
 if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){
   alert('⚠️ This bookmarklet works only on the Clickedu “links” page.');
   return;
 }
 
-/* ---------- 2️⃣ create the floating “Mostra Documents” button ---------- */
+/* ---------- create floating “Mostra Documents” button ---------- */
 const btn=document.createElement('button');
+btn.id='clickeduOverlayBtn';
 btn.textContent='📂 Mostra Documents';
 Object.assign(btn.style,{
   position:'fixed',
@@ -28,7 +36,7 @@ btn.onmouseover=()=>btn.style.background='#0056b3';
 btn.onmouseout=()=>btn.style.background='#007bff';
 document.body.appendChild(btn);
 
-/* ---------- 3️⃣ overlay creation ---------- */
+/* ---------- overlay logic ---------- */
 let overlayVisible=false;
 btn.onclick=function(){
   if(overlayVisible){closeOverlay();return;}
@@ -81,7 +89,6 @@ btn.onclick=function(){
     });
     b.onmouseover=()=>b.style.background='#0056b3';
     b.onmouseout=()=>b.style.background='#007bff';
-    // 🔹 no new tab, just placeholder action
     b.onclick=(e)=>{
       e.preventDefault();
       alert('Clicked: ' + o.l + '\n(No new tab opened)');
@@ -95,6 +102,6 @@ btn.onclick=function(){
 
 /* ---------- END ---------- */
 })();"
-   title="Click‑edu Docs overlay (overlay‑only)">
+   title="Click‑edu Docs overlay (toggle button)">
    📂 Click‑edu Docs overlay
 </a>
