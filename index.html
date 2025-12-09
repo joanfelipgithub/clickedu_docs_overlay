@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clickedu – bookmarklet per la finestra de Documents</title>
 <style>
-/* ... (Estils sense canvis) ... */
 body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f5f5; color: #333; line-height: 1.6; }
 .container { max-width: 720px; margin: auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 .bookmarklet { display: inline-block; background: #ff6b35; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 1rem; cursor: move; font-size: 16px; box-shadow: 0 2px 8px rgba(255,107,53,0.3); transition: all 0.2s; }
@@ -50,146 +49,191 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByS
 const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
 const FINAL_FETCH_URL = PROXY_URL + GOOGLE_SHEET_URL;
 
+/* ------------------- helper functions ------------------- */
 function getTextColor(bgColor){
-    const hslMatch = bgColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-    if(!hslMatch) return '#fff'; 
-    const l = +hslMatch[3]; 
-    return l > 55 ? '#000' : '#fff'; 
+    // Determines if text should be black or white based on HSL lightness (L)
+    const m = bgColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+    if(!m) return '#fff';
+    return (+m[3]) > 55 ? '#000' : '#fff';
 }
 
 function generateGroupColors(groups){
-    const colorMap={};
-    const total=groups.length;
+    // Generates distinct HSL colors based on the number of groups
+    const map = {};
+    const total = groups.length;
     groups.forEach((g,i)=>{
-        const hue=Math.floor((i/total)*360);
-        colorMap[g]={ main:`hsl(${hue},70%,50%)`, hover:`hsl(${hue},80%,40%)` };
+        const hue = Math.floor((i/total)*360);
+        map[g] = { main:`hsl(${hue},70%,50%)`, hover:`hsl(${hue},80%,40%)` };
     });
-    return colorMap;
+    return map;
 }
 
-(async function generateBookmarkletURI() {
+/* ----------------- build the bookmarklet code ---------------- */
+(async function generateBookmarkletURI(){
     let fetchedColorMap = {};
 
-    try {
-        const response = await fetch(FINAL_FETCH_URL);
-        if (!response.ok) throw new Error("No s\\'ha pogut carregar el full de dades.");
-        const csvText = await response.text();
-        
-        const lines = csvText.split('\n').slice(1);
-        const groups = Array.from(new Set(lines.filter(l => l.trim()).map(line => {
-            const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
-            return parts[0] || ''; 
-        }).filter(g => g)));
-        
-        fetchedColorMap = generateGroupColors(groups);
+    try{
+        // 1. Fetch CSV to determine groups for color generation
+        const resp = await fetch(FINAL_FETCH_URL);
+        // Using double quotes and escaping the apostrophe in the error message
+        if(!resp.ok) throw new Error("No s\\'ha pogut carregar el full de dades. Codi: "+resp.status); 
+        const csv = await resp.text();
 
-    } catch (error) {
-        console.error("Error carregant o processant dades de la fulla:", error);
-        fetchedColorMap = { 'default': { main: 'hsl(210, 70%, 50%)', hover: 'hsl(210, 80%, 40%)' } };
+        const lines = csv.split('\n').slice(1);
+        const groups = Array.from(new Set(
+            lines.filter(l=>l.trim())
+                 .map(l=>l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)[0].trim())
+                 .filter(g=>g)
+        ));
+        fetchedColorMap = generateGroupColors(groups);
+    }catch(e){
+        console.error(e);
+        // Default color map in case of fetch failure
+        fetchedColorMap = { default:{ main:'hsl(210,70%,50%)', hover:'hsl(210,80%,40%)' } };
     }
+
+    const colorMapJSON = JSON.stringify(fetchedColorMap);
     
-    const injectedColorMapJSON = JSON.stringify(fetchedColorMap);
-    
-    // Simplificació de la funció de color de text per incloure-la al bookmarklet
+    // Simplified getTextColor function for injection
     const simplifiedGetTextColor = `function(bgColor){
         const m=bgColor.match(/hsl\\((\\d+),\\s*(\\d+)%,\\s*(\\d+)%\\)/);
         if(!m) return '#fff';
         return (+m[3])>55?'#000':'#fff';
     }`;
 
-    // --- Codi del Bookmarklet (amb escapament de l'apòstrof resolt: s\'han, s\'ha) ---
+    /* ---- raw JavaScript that will run as a bookmarklet ---- */
     const rawBookmarkletJS = `(async function(){
         if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){
-            alert("⚠️ Aquest bookmarklet només funciona a la pàgina \\'links\\' de Clickedu.");
+            // Explicitly escaping the single quote in 'links'
+            alert("⚠️ Aquest bookmarklet només funciona a la pàgina \\'links\\' de Clickedu."); 
             return;
         }
-        
-        const COLOR_MAP=${injectedColorMapJSON};
+
+        const COLOR_MAP=${colorMapJSON};
         const getTextColor=${simplifiedGetTextColor};
 
-        // UI Cleanup
-        let formNode=document.evaluate('//form[@action="https://shorturl.at/anS1H"]',document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
-        let containerNode=formNode?.closest('.bloc-info-sumari');
-        if(containerNode) containerNode.style.display='none'; else if(formNode) formNode.style.display='none';
+        /* hide the original form */
+        const form=document.evaluate('//form[@action="https://shorturl.at/anS1H"]',document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
+        const container=form?.closest('.bloc-info-sumari');
+        if(container) container.style.display='none'; else if(form) form.style.display='none';
 
-        // Button Setup
+        /* add the toggle button */
         const btn=document.createElement('button');
         btn.textContent='📂 Mostrar documents';
-        Object.assign(btn.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s,opacity .3s',fontWeight:'bold',opacity:'1'});
+        Object.assign(btn.style,{
+            position:'fixed',top:'10px',right:'10px',zIndex:9999,
+            padding:'10px 15px',background:'#007bff',color:'#fff',
+            border:'none',borderRadius:'8px',cursor:'pointer',
+            boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s,opacity .3s',
+            fontWeight:'bold',opacity:'1'
+        });
         btn.onmouseover=()=>btn.style.background='#0056b3';
         btn.onmouseout=()=>btn.style.background='#007bff';
         document.body.appendChild(btn);
 
         let overlayVisible=false;
         btn.onclick=async function(){
-            if(containerNode) containerNode.style.display='none'; else if(formNode) formNode.style.display='none';
-            if(overlayVisible){closeOverlay();btn.style.opacity='1';return;}
+            if(container) container.style.display='none'; else if(form) form.style.display='none';
+            if(overlayVisible){closeOverlay();return;}
 
-            overlayVisible=true; btn.style.opacity='0.2';
+            overlayVisible=true;
+            btn.style.opacity='0.2';
+
             const overlay=document.createElement('div');
-            Object.assign(overlay.style,{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'rgba(0,0,0,0.8)',zIndex:9998,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'20px',overflowY:'auto'});
+            Object.assign(overlay.style,{
+                position:'fixed',top:0,left:0,width:'100%',height:'100%',
+                background:'rgba(0,0,0,0.8)',zIndex:9998,
+                display:'flex',flexDirection:'column',alignItems:'center',
+                justifyContent:'center',padding:'20px',overflowY:'auto'
+            });
             overlay.addEventListener('click',e=>{if(e.target===overlay) closeOverlay();});
             document.body.appendChild(overlay);
 
+            const esc=e=>{if(e.key==='Escape') closeOverlay();};
             document.addEventListener('keydown',esc);
-            function esc(e){if(e.key==='Escape') closeOverlay();}
-            function closeOverlay(){overlay.remove();document.removeEventListener('keydown',esc);overlayVisible=false;btn.style.opacity='1';}
+            function closeOverlay(){
+                overlay.remove();
+                document.removeEventListener('keydown',esc);
+                overlayVisible=false;
+                btn.style.opacity='1';
+            }
 
-            const loadingMsg=document.createElement('div');
-            loadingMsg.textContent="⏳ Carregant documents (via proxy)..."; 
-            Object.assign(loadingMsg.style,{color:'white',fontSize:'18px',marginBottom:'20px'});
-            overlay.appendChild(loadingMsg);
+            const loading=document.createElement('div');
+            loading.textContent='⏳ Carregant documents...';
+            Object.assign(loading.style,{color:'white',fontSize:'18px',marginBottom:'20px'});
+            overlay.appendChild(loading);
 
             try{
-                const response=await fetch('${FINAL_FETCH_URL}');
-                if(!response.ok) throw new Error("Càrrega fallida. Codi: "+response.status); 
-                const csvText=await response.text();
-                const lines=csvText.split('\\n').slice(1);
-                
-                const docs=lines.filter(l=>l.trim()).map(line=>{
-                    const parts=line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p=>p.replace(/^"|"$/g,'').trim());
-                    if(parts.length>=3) return {g:parts[0], l:parts[1], u:parts[2]};
-                    return null;
-                }).filter(d=>d && d.g && d.l && d.u);
+                const r=await fetch('${FINAL_FETCH_URL}');
+                if(!r.ok) throw new Error("Càrrega fallida. Codi: "+r.status);
+                const csv2=await r.text();
+                const rows=csv2.split('\\n').slice(1);
+                const docs=rows.filter(l=>l.trim()).map(l=>{
+                    const p=l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v=>v.replace(/^"|"$/g,'').trim());
+                    if(p.length>=3) return {g:p[0],l:p[1],u:p[2]};
+                }).filter(o=>o&&o.g&&o.l&&o.u);
 
-                loadingMsg.remove();
+                loading.remove();
                 if(docs.length===0){
-                    loadingMsg.textContent="⚠️ No s\\'han trobat documents vàlids al full de càlcul."; // ESCAPAMENT CORREGIT
-                    loadingMsg.style.color='#ffc107'; overlay.appendChild(loadingMsg); return;
+                    const msg=document.createElement('div');
+                    // ESCAPAMENT CORREGIT: s\'han
+                    msg.textContent="⚠️ No s\\'han trobat documents vàlids al full de càlcul."; 
+                    msg.style.color='#ffc107';
+                    overlay.appendChild(msg);
+                    return;
                 }
 
                 const grid=document.createElement('div');
-                Object.assign(grid.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:'15px',maxWidth:'1200px',width:'100%'});
+                Object.assign(grid.style,{
+                    display:'grid',
+                    gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',
+                    gap:'15px',
+                    maxWidth:'1200px',
+                    width:'100%'
+                });
 
-                docs.forEach(o=>{
-                    const b=document.createElement('button'); b.textContent=o.l;
-                    const colors = COLOR_MAP[o.g] || COLOR_MAP.default;
-                    
-                    Object.assign(b.style,{padding:'15px',fontSize:'16px',cursor:'pointer',borderRadius:'12px',border:'none',background:colors.main,color:getTextColor(colors.main),boxShadow:'0 4px 6px rgba(0,0,0,0.2)',transition:'background .2s'});
-                    
-                    b.onmouseover=()=>{b.style.background=colors.hover; b.style.color=getTextColor(colors.hover);};
-                    b.onmouseout=()=>{b.style.background=colors.main; b.style.color=getTextColor(colors.main);};
-                    b.onclick=()=>window.open(o.u,'_blank');
-                    grid.appendChild(b);
+                docs.forEach(d=>{
+                    const btn=document.createElement('button');
+                    btn.textContent=d.l;
+                    const col=COLOR_MAP[d.g]||COLOR_MAP.default;
+                    Object.assign(btn.style,{
+                        padding:'15px',
+                        fontSize:'16px',
+                        cursor:'pointer',
+                        borderRadius:'12px',
+                        border:'none',
+                        background:col.main,
+                        color:getTextColor(col.main),
+                        boxShadow:'0 4px 6px rgba(0,0,0,0.2)',
+                        transition:'background .2s'
+                    });
+                    btn.onmouseover=()=>{btn.style.background=col.hover;btn.style.color=getTextColor(col.hover);};
+                    btn.onmouseout=()=>{btn.style.background=col.main;btn.style.color=getTextColor(col.main);};
+                    btn.onclick=()=>window.open(d.u,'_blank');
+                    grid.appendChild(btn);
                 });
                 overlay.appendChild(grid);
 
             }catch(err){
-                loadingMsg.textContent="❌ Error crític: No s\\'ha pogut carregar. Detall: "+err.message; // ESCAPAMENT CORREGIT
-                loadingMsg.style.color='#ff6b6b';
+                // ESCAPAMENT CORREGIT: s\'ha
+                loading.textContent="❌ Error crític: No s\\'ha pogut carregar. Detall: "+err.message;
+                loading.style.color='#ff6b6b';
             }
         };
-    })()`.replace(/\s{2,}/g, ' ').replace(/\n/g, ''); 
+    })()`;
 
-    const finalBookmarkletURI = 'javascript:' + encodeURIComponent(rawBookmarkletJS);
+    // 2. Minify the JS code to remove unnecessary whitespace/newlines
+    const minifiedJS = rawBookmarkletJS.replace(/\s{2,}/g, ' ').replace(/\n/g, ''); 
 
-    // --- Actualització de la UI ---
+    // 3. Use the robust encodeURIComponent() to safely encode the entire script
+    const finalBookmarkletURI = 'javascript:' + encodeURIComponent(minifiedJS);
+
+    // 4. Update the UI links
     document.getElementById('bookmarkletLink').href = finalBookmarkletURI;
     document.getElementById('copyBox').value = finalBookmarkletURI;
 })();
 
-
-// Lògica de copiat 
+/* -------------------- copy to clipboard logic -------------------- */
 document.getElementById('copyBtn').addEventListener('click', function(){
     const ta=document.getElementById('copyBox'); ta.select(); ta.setSelectionRange(0,99999);
     navigator.clipboard.writeText(ta.value).then(()=>{
