@@ -50,72 +50,57 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByS
 const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
 const FINAL_FETCH_URL = PROXY_URL + GOOGLE_SHEET_URL;
 
-// --- FUNCIONS AUXILIARS DE COLOR A LA PÀGINA HOST ---
-
-// 1. Converteix HSL a RGB i determina la brillantor per al color del text.
-// **S'ha corregit la lògica HSLtoRGB per a més robustesa amb els valors HSL literals**
 function getTextColor(bgColor){
     const hslMatch = bgColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
     if(!hslMatch) return '#fff'; 
-    
-    // Simplificada: Si la claredat (Luminosity) és superior a un llindar, usa text fosc.
-    const l = +hslMatch[3]; // L part of HSL in percentage
-    return l > 55 ? '#000' : '#fff'; // Dark text for bright backgrounds, light text otherwise.
+    const l = +hslMatch[3]; 
+    return l > 55 ? '#000' : '#fff'; 
 }
 
-// 2. Genera colors diferents per a qualsevol nombre de grups
 function generateGroupColors(groups){
     const colorMap={};
     const total=groups.length;
     groups.forEach((g,i)=>{
         const hue=Math.floor((i/total)*360);
-        // Utilitzem L=50% per al color principal i L=40% per al hover
         colorMap[g]={ main:`hsl(${hue},70%,50%)`, hover:`hsl(${hue},80%,40%)` };
     });
     return colorMap;
 }
 
-// --- CODI FETCH PER GENERAR EL BOOKMARKLET (Executeu-ho immediatament) ---
 (async function generateBookmarkletURI() {
-    let finalBookmarkletURI = '';
     let fetchedColorMap = {};
 
     try {
-        // Pas 1: Carregar el CSV per determinar quins grups hi ha i generar el mapa de colors
         const response = await fetch(FINAL_FETCH_URL);
-        if (!response.ok) throw new Error('No s\'ha pogut carregar el full de dades.');
+        if (!response.ok) throw new Error("No s\\'ha pogut carregar el full de dades.");
         const csvText = await response.text();
         
-        // Utilitzem la mateixa lògica de parsing que el bookmarklet
         const lines = csvText.split('\n').slice(1);
         const groups = Array.from(new Set(lines.filter(l => l.trim()).map(line => {
             const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
-            return parts[0] || ''; // Retorna el grup (Col A)
-        }).filter(g => g))); // Filtra grups buits
+            return parts[0] || ''; 
+        }).filter(g => g)));
         
         fetchedColorMap = generateGroupColors(groups);
 
     } catch (error) {
         console.error("Error carregant o processant dades de la fulla:", error);
-        // En cas de fallada, utilitza colors per defecte o un mapa buit
         fetchedColorMap = { 'default': { main: 'hsl(210, 70%, 50%)', hover: 'hsl(210, 80%, 40%)' } };
     }
     
-    // --- Pas 2: INCORPORAR ELS CÀLCULS DE COLOR DINS EL BOOKMARKLET ---
     const injectedColorMapJSON = JSON.stringify(fetchedColorMap);
     
-    // La funció getTextColor s'inclou com a text per separat per poder ser utilitzada pel bookmarklet
-    // S'ha simplificat la lògica per a minimitzar la mida del codi HSL->Text Color
+    // Simplificació de la funció de color de text per incloure-la al bookmarklet
     const simplifiedGetTextColor = `function(bgColor){
         const m=bgColor.match(/hsl\\((\\d+),\\s*(\\d+)%,\\s*(\\d+)%\\)/);
         if(!m) return '#fff';
         return (+m[3])>55?'#000':'#fff';
     }`;
 
-    // --- Pas 3: CODI FINAL DEL BOOKMARKLET (amb les dades injectades) ---
+    // --- Codi del Bookmarklet (amb escapament de l'apòstrof resolt: s\'han, s\'ha) ---
     const rawBookmarkletJS = `(async function(){
         if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){
-            alert('⚠️ Aquest bookmarklet només funciona a la pàgina "links" de Clickedu.');
+            alert("⚠️ Aquest bookmarklet només funciona a la pàgina \\'links\\' de Clickedu.");
             return;
         }
         
@@ -151,13 +136,13 @@ function generateGroupColors(groups){
             function closeOverlay(){overlay.remove();document.removeEventListener('keydown',esc);overlayVisible=false;btn.style.opacity='1';}
 
             const loadingMsg=document.createElement('div');
-            loadingMsg.textContent='⏳ Carregant documents (via proxy)...';
+            loadingMsg.textContent="⏳ Carregant documents (via proxy)..."; 
             Object.assign(loadingMsg.style,{color:'white',fontSize:'18px',marginBottom:'20px'});
             overlay.appendChild(loadingMsg);
 
             try{
                 const response=await fetch('${FINAL_FETCH_URL}');
-                if(!response.ok) throw new Error('Càrrega fallida. Codi: '+response.status);
+                if(!response.ok) throw new Error("Càrrega fallida. Codi: "+response.status); 
                 const csvText=await response.text();
                 const lines=csvText.split('\\n').slice(1);
                 
@@ -168,7 +153,10 @@ function generateGroupColors(groups){
                 }).filter(d=>d && d.g && d.l && d.u);
 
                 loadingMsg.remove();
-                if(docs.length===0){loadingMsg.textContent='⚠️ No s\'han trobat documents vàlids al full de càlcul.'; loadingMsg.style.color='#ffc107'; overlay.appendChild(loadingMsg); return;}
+                if(docs.length===0){
+                    loadingMsg.textContent="⚠️ No s\\'han trobat documents vàlids al full de càlcul."; // ESCAPAMENT CORREGIT
+                    loadingMsg.style.color='#ffc107'; overlay.appendChild(loadingMsg); return;
+                }
 
                 const grid=document.createElement('div');
                 Object.assign(grid.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:'15px',maxWidth:'1200px',width:'100%'});
@@ -187,21 +175,21 @@ function generateGroupColors(groups){
                 overlay.appendChild(grid);
 
             }catch(err){
-                loadingMsg.textContent='❌ Error crític: '+err.message;
+                loadingMsg.textContent="❌ Error crític: No s\\'ha pogut carregar. Detall: "+err.message; // ESCAPAMENT CORREGIT
                 loadingMsg.style.color='#ff6b6b';
             }
         };
-    })()`.replace(/\s{2,}/g, ' ').replace(/\n/g, ''); // Minify the JS
+    })()`.replace(/\s{2,}/g, ' ').replace(/\n/g, ''); 
 
-    finalBookmarkletURI = 'javascript:' + encodeURIComponent(rawBookmarkletJS);
+    const finalBookmarkletURI = 'javascript:' + encodeURIComponent(rawBookmarkletJS);
 
-    // --- Pas 4: ACTUALITZAR LA UI ---
+    // --- Actualització de la UI ---
     document.getElementById('bookmarkletLink').href = finalBookmarkletURI;
     document.getElementById('copyBox').value = finalBookmarkletURI;
 })();
 
 
-// Lògica de copiat (es manté igual)
+// Lògica de copiat 
 document.getElementById('copyBtn').addEventListener('click', function(){
     const ta=document.getElementById('copyBox'); ta.select(); ta.setSelectionRange(0,99999);
     navigator.clipboard.writeText(ta.value).then(()=>{
