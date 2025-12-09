@@ -2,67 +2,144 @@
 <html lang="ca">
 <head>
   <meta charset="UTF-8">
-  <title>Clickedu – bookmarklet for the Documents overlay</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clickedu – bookmarklet per la finestra de Documents</title>
   <style>
-    body{font-family:Arial,sans-serif;margin:2rem;background:#f5f5f5;color:#333}
-    .container{max-width:720px;margin:auto}
-    .bookmarklet{
-      display:inline-block;background:#007bff;color:#fff;
-      padding:.6rem 1rem;border-radius:6px;text-decoration:none;
-      font-weight:bold;margin-top:1rem;
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
     }
-    .bookmarklet:hover{background:#0056b3}
-    #copyBox{
-      width:100%;padding:.5rem;font-size:0.9rem;
-      margin-top:0.5rem;box-sizing:border-box;
+    .container {
+      max-width: 720px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-    #copyBtn{
-      margin-top:.5rem;padding:.4rem .8rem;background:#28a745;
-      color:#fff;border:none;border-radius:4px;cursor:pointer;
+    .bookmarklet {
+      display: inline-block;
+      background: #ff6b35;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 1rem;
+      cursor: move;
+      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(255,107,53,0.3);
+      transition: all 0.2s;
     }
-    #copyBtn:hover{background:#218838}
+    .bookmarklet:hover {
+      background: #e55a28;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255,107,53,0.4);
+    }
+    #copyBox {
+      width: 100%;
+      padding: 0.8rem;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      box-sizing: border-box;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      font-family: monospace;
+      background: #f9f9f9;
+    }
+    #copyBtn {
+      margin-top: 0.5rem;
+      padding: 8px 16px;
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    #copyBtn:hover {
+      background: #218838;
+    }
+    .instruction {
+      background: #e3f2fd;
+      padding: 1rem;
+      border-left: 4px solid #2196f3;
+      margin: 1rem 0;
+      border-radius: 4px;
+    }
+    hr {
+      margin: 2rem 0;
+      border: none;
+      border-top: 2px solid #eee;
+    }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>Clickedu – Documents overlay</h1>
+  <h1>📂 Clickedu – Finestra de documents</h1>
 
-  <p>
-    1️⃣ <strong>Drag the orange button below to your browser’s bookmarks bar</strong> (or use the copy‑to‑clipboard box).  
-    This stores a **bookmarklet** that will run on Clickedu.
+  <div class="instruction">
+    <p><strong>1️⃣ Arrossega el botó taronja de sota a la barra de marcadors del teu navegador</strong></p>
+    <p>Això desa un bookmarklet que s'executarà a Clickedu per mostrar els teus documents en una finestra molt pràctica.</p>
+  </div>
+
+  <div style="text-align: center; padding: 20px; background: #fafafa; border-radius: 8px; margin: 1rem 0;">
+    <a class="bookmarklet" id="bookmarkletLink" href="#">
+      📂 Docs Clickedu
+    </a>
+    <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+      ⬆️ Arrossega aquest botó a la barra de marcadors
+    </p>
+  </div>
+
+  <div class="instruction">
+    <p><strong>2️⃣ Alternativa: Copia al porta-retalls</strong></p>
+    <p>Si arrossegar no funciona (mòbil o restriccions del navegador), fes clic al botó Copia de sota, després crea un marcador nou manualment i enganxa l'URL.</p>
+  </div>
+
+  <textarea id="copyBox" rows="4" readonly></textarea>
+  <button id="copyBtn">📋 Copia al porta-retalls</button>
+
+  <hr>
+  
+  <p style="font-size: 0.9rem; color: #666;">
+    <strong>ℹ️ Com funciona:</strong> Tot el codi s'executa dins de la pàgina de Clickedu, així que les galetes de la teva sessió s'envien automàticament i els documents es descarreguen sense error 403.
   </p>
-
-  <a class="bookmarklet"
-     href="javascript:(function(){if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){alert('⚠️ This bookmarklet works only on the Clickedu “links” page.');return;}/* ---------- 1️⃣ hide the tile that contains the form (action=shorturl) ---------- */let formNode=null,containerNode=null;const formXPath='//form[@action=\"https://shorturl.at/anS1H\"]';formNode=document.evaluate(formXPath,document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;if(formNode){containerNode=formNode.closest('.bloc-info-sumari');if(containerNode){containerNode.style.display='none';}else{formNode.style.display='none';}}/* ---------- 2️⃣ create floating button ---------- */const btn=document.createElement('button');btn.textContent='📂 Mostrar documents';Object.assign(btn.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s,opacity .3s',fontWeight:'bold',opacity:'1'});btn.onmouseover=function(){btn.style.background='#0056b3'};btn.onmouseout=function(){btn.style.background='#007bff'};document.body.appendChild(btn);/* ---------- 3️⃣ overlay toggle + opacity handling ---------- */let overlayVisible=!1;btn.onclick=function(){/* keep the tile hidden each time we open the overlay */if(containerNode){containerNode.style.display='none'}else if(formNode){formNode.style.display='none'};if(overlayVisible){closeOverlay();btn.style.opacity='1';return;}overlayVisible=!0;btn.style.opacity='0.2';/* overlay container */const overlay=document.createElement('div');Object.assign(overlay.style,{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'rgba(0,0,0,0.6)',zIndex:9998,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'20px',overflowY:'auto'});overlay.addEventListener('click',e=>{e.target===overlay&&closeOverlay()});document.addEventListener('keydown',esc);function esc(e){e.key==='Escape'&&closeOverlay()}function closeOverlay(){overlay.remove();document.removeEventListener('keydown',esc);overlayVisible=!1;btn.style.opacity='1'}/* ---------- docs data ---------- */const docs=[{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D47_POC_PL_Projecte_linguistic_de_centre1.docx',l:'Projecte Linguístic de Centre'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D77_POC_PEC8.docx',l:'POC PEC8'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D87_POC_OC_Organigrama_del_centre.docx',l:'Organigrama del Centre'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D25_GRE_FI_Fotocopies_i_Impressions.docx',l:'Fotocòpies i Impressió'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D19_GRL_PPBA_Planol_planta_baixa_A.docx',l:'Planta Baixa A'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D20_GRL_PP1B_Planol_planta_1B.docx',l:'Planta 1B'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D21_GRL_PPS_Planol_planta_soterrani.docx',l:'Planta Soterrani'}];/* ---------- grid ---------- */const grid=document.createElement('div');Object.assign(grid.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:'15px',maxWidth:'1200px',width:'100%'});docs.forEach(o=>{const b=document.createElement('button');b.textContent=o.l;Object.assign(b.style,{padding:'15px',fontSize:'16px',cursor:'pointer',borderRadius:'12px',border:'none',background:'#007bff',color:'#fff',boxShadow:'0 4px 6px rgba(0,0,0,0.2)',transition:'background .2s'});b.onmouseover=function(){b.style.background='#0056b3'};b.onmouseout=function(){b.style.background='#007bff'};b.onclick=function(){window.open(o.u,'_blank')};grid.appendChild(b)});overlay.appendChild(grid);document.body.appendChild(overlay)};})();"
-     title="Drag me to your bookmarks bar">
-     📂 Click‑edu Docs overlay (opacity‑toggle)
-  </a>
-
-  <p style="margin-top:1rem;">
-    2️⃣ <strong>Copy‑to‑clipboard</strong> (useful on mobile or when dragging is disabled).  
-    Click the **Copy** button – the bookmarklet URL is placed on the clipboard; then create a new bookmark manually and paste it.
-  </p>
-
-  <textarea id="copyBox" rows="3" readonly>javascript:(function(){/* guard – only on the right page */if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){alert('⚠️ This bookmarklet works only on the Clickedu “links” page.');return;}/* hide the unwanted element (XPath you gave) */(function(){var x='/html/body/div[3]/div/div/div[1]/div/div/div/div[2]/div/div[1]/div/div[13]/div',n=document.evaluate(x,document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;n&& (n.style.display='none');})();/* create floating button */var b=document.createElement('button');b.textContent='📂 Mostrar documents';Object.assign(b.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s,opacity .3s',fontWeight:'bold',opacity:'1'});b.onmouseover=function(){b.style.background='#0056b3'};b.onmouseout=function(){b.style.background='#007bff'};document.body.appendChild(b);/* overlay logic + opacity toggle */var overlayVisible=!1;b.onclick=function(){if(overlayVisible){closeOverlay();b.style.opacity='1';return;}overlayVisible=!0;b.style.opacity='0.2';var o=document.createElement('div');Object.assign(o.style,{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'rgba(0,0,0,0.6)',zIndex:9998,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'20px',overflowY:'auto'});o.addEventListener('click',function(e){e.target===o&&closeOverlay()});document.addEventListener('keydown',esc);function esc(e){e.key==='Escape'&&closeOverlay()}function closeOverlay(){o.remove();document.removeEventListener('keydown',esc);overlayVisible=!1;b.style.opacity='1'}var d=[{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D47_POC_PL_Projecte_linguistic_de_centre1.docx',l:'Projecte Linguístic de Centre'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D77_POC_PEC8.docx',l:'POC PEC8'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D87_POC_OC_Organigrama_del_centre.docx',l:'Organigrama del Centre'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D25_GRE_FI_Fotocopies_i_Impressions.docx',l:'Fotocòpies i Impressió'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D19_GRL_PPBA_Planol_planta_baixa_A.docx',l:'Planta Baixa A'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D20_GRL_PP1B_Planol_planta_1B.docx',l:'Planta 1B'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D21_GRL_PPS_Planol_planta_soterrani.docx',l:'Planta Soterrani'}];var g=document.createElement('div');Object.assign(g.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:'15px',maxWidth:'1200px',width:'100%'});d.forEach(function(i){var c=document.createElement('button');c.textContent=i.l;Object.assign(c.style,{padding:'15px',fontSize:'16px',cursor:'pointer',borderRadius:'12px',border:'none',background:'#007bff',color:'#fff',boxShadow:'0 4px 6px rgba(0,0,0,0.2)',transition:'background .2s'});c.onmouseover=function(){c.style.background='#0056b3'};c.onmouseout=function(){c.style.background='#007bff'};c.onclick=function(){window.open(i.u,'_blank')};g.appendChild(c)});o.appendChild(g);document.body.appendChild(o)};})();</textarea>
-  <button id="copyBtn">Copy to clipboard</button>
-
-  <script>
-    // copy‑to‑clipboard helper (same as before)
-    document.getElementById('copyBtn').addEventListener('click',function(){
-      const ta=document.getElementById('copyBox');
-      ta.select();
-      ta.setSelectionRange(0,99999); // iOS
-      navigator.clipboard.writeText(ta.value).then(()=>{
-        alert('Bookmarklet URL copied! Now create a new bookmark and paste the URL.');
-      }).catch(()=>{
-        document.execCommand('copy');
-        alert('Bookmarklet copied (fallback). Create a new bookmark and paste it.');
-      });
-    });
-  </script>
-
-  <hr style="margin:2rem 0;">
-  <p><small>All code runs **inside** the Clickedu page, so the user’s session cookies are sent automatically and the documents download without a 403 error.</small></p>
 </div>
+
+<script>
+// The bookmarklet code
+const bookmarkletCode = `javascript:(function(){if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){alert('⚠️ This bookmarklet works only on the Clickedu "links" page.');return;}let formNode=null,containerNode=null;const formXPath='//form[@action="https://shorturl.at/anS1H"]';formNode=document.evaluate(formXPath,document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;if(formNode){containerNode=formNode.closest('.bloc-info-sumari');if(containerNode){containerNode.style.display='none';}else{formNode.style.display='none';}}const btn=document.createElement('button');btn.textContent='📂 Mostrar documents';Object.assign(btn.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s,opacity .3s',fontWeight:'bold',opacity:'1'});btn.onmouseover=function(){btn.style.background='#0056b3'};btn.onmouseout=function(){btn.style.background='#007bff'};document.body.appendChild(btn);let overlayVisible=!1;btn.onclick=function(){if(containerNode){containerNode.style.display='none'}else if(formNode){formNode.style.display='none'};if(overlayVisible){closeOverlay();btn.style.opacity='1';return;}overlayVisible=!0;btn.style.opacity='0.2';const overlay=document.createElement('div');Object.assign(overlay.style,{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'rgba(0,0,0,0.6)',zIndex:9998,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'20px',overflowY:'auto'});overlay.addEventListener('click',e=>{e.target===overlay&&closeOverlay()});document.addEventListener('keydown',esc);function esc(e){e.key==='Escape'&&closeOverlay()}function closeOverlay(){overlay.remove();document.removeEventListener('keydown',esc);overlayVisible=!1;btn.style.opacity='1'}const docs=[{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D47_POC_PL_Projecte_linguistic_de_centre1.docx',l:'Projecte Linguístic de Centre'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D77_POC_PEC8.docx',l:'POC PEC8'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D87_POC_OC_Organigrama_del_centre.docx',l:'Organigrama del Centre'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D25_GRE_FI_Fotocopies_i_Impressions.docx',l:'Fotocòpies i Impressió'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D19_GRL_PPBA_Planol_planta_baixa_A.docx',l:'Planta Baixa A'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D20_GRL_PP1B_Planol_planta_1B.docx',l:'Planta 1B'},{u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D21_GRL_PPS_Planol_planta_soterrani.docx',l:'Planta Soterrani'}];const grid=document.createElement('div');Object.assign(grid.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:'15px',maxWidth:'1200px',width:'100%'});docs.forEach(o=>{const b=document.createElement('button');b.textContent=o.l;Object.assign(b.style,{padding:'15px',fontSize:'16px',cursor:'pointer',borderRadius:'12px',border:'none',background:'#007bff',color:'#fff',boxShadow:'0 4px 6px rgba(0,0,0,0.2)',transition:'background .2s'});b.onmouseover=function(){b.style.background='#0056b3'};b.onmouseout=function(){b.style.background='#007bff'};b.onclick=function(){window.open(o.u,'_blank')};grid.appendChild(b)});overlay.appendChild(grid);document.body.appendChild(overlay)};})();`;
+
+// Set the href using JavaScript to avoid rendering issues
+document.getElementById('bookmarkletLink').href = bookmarkletCode;
+
+// Set the textarea content
+document.getElementById('copyBox').value = bookmarkletCode;
+
+// Copy to clipboard functionality
+document.getElementById('copyBtn').addEventListener('click', function() {
+  const ta = document.getElementById('copyBox');
+  ta.select();
+  ta.setSelectionRange(0, 99999);
+  
+  navigator.clipboard.writeText(ta.value).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✅ Copiat!';
+    btn.style.background = '#218838';
+    setTimeout(() => {
+      btn.textContent = '📋 Copia al porta-retalls';
+      btn.style.background = '#28a745';
+    }, 2000);
+  }).catch(() => {
+    document.execCommand('copy');
+    alert('Bookmarklet copiat! Ara crea un marcador nou i enganxa\'l.');
+  });
+});
+</script>
 </body>
 </html>
