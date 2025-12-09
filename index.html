@@ -1,100 +1,54 @@
-<!DOCTYPE html>
-<html lang="ca">
-<head>
-  <meta charset="UTF-8">
-  <title>Clickedu – Documents overlay</title>
-  <style>
-    body{
-      font-family:Arial,Helvetica,sans-serif;
-      margin:2rem;
-      background:#f5f5f5;
-      color:#333;
-    }
-    h1{
-      color:#007bff;
-    }
-    .bookmarklet{
-      display:inline-block;
-      background:#007bff;
-      color:#fff;
-      padding:.6rem 1rem;
-      border-radius:6px;
-      text-decoration:none;
-      font-weight:bold;
-      margin-top:1rem;
-    }
-    .bookmarklet:hover{
-      background:#0056b3;
-    }
-    .copyBtn{
-      margin-left:1rem;
-      padding:.4rem .8rem;
-      font-size:.9rem;
-      cursor:pointer;
-    }
-    pre{
-      background:#fff;
-      padding:1rem;
-      border:1px solid #ddd;
-      overflow:auto;
-    }
-  </style>
-</head>
-<body>
-  <h1>Documents overlay for Clickedu</h1>
-
-  <p>
-    <strong>Step 1 – Drag the button below to your bookmarks bar</strong> (or right‑click → “Bookmark this link”).  
-    The button will be stored as a *bookmarklet* – a tiny piece of JavaScript that runs on the page you’re viewing.
-  </p>
-
-  <!-- THE BOOKMARKLET -->
-  <a class="bookmarklet"
-     href="javascript:(function(){const d=[{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D47_POC_PL_Projecte_linguistic_de_centre1.docx',l:'Projecte Linguístic de Centre'},{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D77_POC_PEC8.docx',l:'POC PEC8'},{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D87_POC_OC_Organigrama_del_centre.docx',l:'Organigrama del Centre'},{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D25_GRE_FI_Fotocopies_i_Impressions.docx',l:'Fotocòpies i Impressió'},{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D19_GRL_PPBA_Planol_planta_baixa_A.docx',l:'Planta Baixa A'},{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D20_GRL_PP1B_Planol_planta_1B.docx',l:'Planta 1B'},{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D21_GRL_PPS_Planol_planta_soterrani.docx',l:'Planta Soterrani'}];const t=document.createElement('button');t.textContent='📂 Mostra Documents';Object.assign(t.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',boxShadow:'0 2px 4px rgba(0,0,0,.2)'});document.body.appendChild(t);const p=document.createElement('div');Object.assign(p.style,{background:'#f9f9f9',padding:'20px',marginTop:'60px',border:'2px solid #007bff',borderRadius:'12px',display:'none'});const h=document.createElement('h2');h.textContent='Documents overlay';h.style.color='#007bff';p.appendChild(h);const g=document.createElement('div');Object.assign(g.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:'10px'});d.forEach(i=>{const b=document.createElement('button');b.textContent=i.l;Object.assign(b.style,{padding:'10px',fontSize:'14px',cursor:'pointer',borderRadius:'8px',border:'none',background:'#007bff',color:'#fff',boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s'});b.onmouseover=()=>b.style.background='#0056b3';b.onmouseout=()=>b.style.background='#007bff';b.onclick=()=>window.location.href=i.u;g.appendChild(b);});p.appendChild(g);document.body.appendChild(p);t.addEventListener('click',()=>{if(p.style.display==='none'){p.style.display='block';t.textContent='📂 Amaga Documents';}else{p.style.display='none';t.textContent='📂 Mostra Documents';}});})();"
-     title="Drag me to your bookmarks bar">
-    📂 Click‑edu Docs overlay
-  </a>
-
-  <!-- optional copy‑to‑clipboard button for people who can’t drag -->
-  <button id="copyBtn" class="copyBtn">Copy URL</button>
-
-  <p>
-    <strong>Step 2 – Open Clickedu (log in first)</strong>  
-    Example page: <code>https://insscf.clickedu.eu/sumari/index.php?p=links</code>
-  </p>
-
-  <p>
-    <strong>Step 3 – Click the bookmarklet</strong> while you are on the Clickedu page.  
-    A floating button “📂 Mostra Documents” appears. Click it – the panel with all document buttons slides down.  
-    Clicking a document button downloads the file **without a 403 error**, because the request is made from the same Clickedu origin.
-  </p>
-
-  <h2>Why this works</h2>
-  <ul>
-    <li>The bookmarklet runs **inside the Clickedu domain**, so the browser automatically sends the session cookies.</li>
-    <li>No iframe, no <code>window.open</code> tricks – all blocked by Clickedu’s <code>X‑Frame‑Options: SAMEORIGIN</code>.</li>
-    <li>The only thing you need to host on HTTPS is this landing page (GitHub Pages or Google Sites). The overlay code never leaves Clickedu.</li>
-  </ul>
-
-  <h2>Google Sites button (optional)</h2>
-  <p>
-    If you want a Google Sites button that points to this page, simply set the button’s link to  
-    <code>https://joanfelipgithub.github.io/clickedu_docs_overlay/</code>.  
-    Users will land on the landing page, drag the bookmarklet, then follow steps 2‑3.
-  </p>
-
-  <footer style="margin-top:2rem;font-size:0.9em;color:#666;">
-    Created by Joan Felipe – 2025
-  </footer>
-
-  <script>
-    // Copy‑to‑clipboard helper (for people who can’t drag)
-    document.getElementById('copyBtn').onclick = function () {
-      const url = document.querySelector('.bookmarklet').href;
-      navigator.clipboard.writeText(url).then(() => {
-        alert('Bookmarklet URL copied! Create a new bookmark and paste the URL into it.');
-      });
-    };
-  </script>
-</body>
-</html>
+<a class="bookmarklet"
+   href="javascript:(function(){
+     /* ---- safety: run only on Clickedu ---- */
+     if(!location.hostname.includes('clickedu.eu')){
+       alert('⚠️ You must run this bookmarklet while you are on a Clickedu page (e.g. https://insscf.clickedu.eu/… ).');
+       return;
+     }
+     const docs=[
+       {u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D47_POC_PL_Projecte_linguistic_de_centre1.docx',l:'Projecte Linguístic de Centre'},
+       {u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D77_POC_PEC8.docx',l:'POC PEC8'},
+       {u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D87_POC_OC_Organigrama_del_centre.docx',l:'Organigrama del Centre'},
+       {u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D25_GRE_FI_Fotocopies_i_Impressions.docx',l:'Fotocòpies i Impressió'},
+       {u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D19_GRL_PPBA_Planol_planta_baixa_A.docx',l:'Planta Baixa A'},
+       {u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D20_GRL_PP1B_Planol_planta_1B.docx',l:'Planta 1B'},
+       {u:'https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D21_GRL_PPS_Planol_planta_soterrani.docx',l:'Planta Soterrani'}
+     ];
+     /* ---- create overlay ---- */
+     const overlay=document.createElement('div');
+     Object.assign(overlay.style,{
+       position:'fixed',top:0,left:0,width:'100%',height:'100%',
+       background:'rgba(0,0,0,0.6)',zIndex:9999,
+       display:'flex',flexDirection:'column',alignItems:'center',
+       justifyContent:'center',padding:'20px',overflowY:'auto'
+     });
+     overlay.addEventListener('click',e=>{if(e.target===overlay)close();});
+     const esc=e=>{if(e.key==='Escape')close();};
+     document.addEventListener('keydown',esc);
+     function close(){overlay.remove();document.removeEventListener('keydown',esc);}
+     const container=document.createElement('div');
+     Object.assign(container.style,{
+       display:'grid',
+       gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',
+       gap:'15px',maxWidth:'1200px',width:'100%'
+     });
+     docs.forEach(o=>{
+       const btn=document.createElement('button');
+       btn.textContent=o.l;
+       Object.assign(btn.style,{
+         padding:'15px',fontSize:'16px',cursor:'pointer',
+         borderRadius:'12px',border:'none',
+         background:'#007bff',color:'#fff',
+         boxShadow:'0 4px 6px rgba(0,0,0,0.2)',transition:'0.2s'
+       });
+       btn.onmouseover=()=>btn.style.background='#0056b3';
+       btn.onmouseout=()=>btn.style.background='#007bff';
+       btn.onclick=()=>window.open(o.u,'_blank');
+       container.appendChild(btn);
+     });
+     overlay.appendChild(container);
+     document.body.appendChild(overlay);
+   })();"
+   title="Drag me to your bookmarks bar">
+   📂 Click‑edu Docs overlay
+</a>
