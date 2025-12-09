@@ -119,13 +119,13 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByS
 const PROXY_URL = 'https://cors-anywhere.herokuapp.com/'; 
 const FINAL_FETCH_URL = PROXY_URL + GOOGLE_SHEET_URL;
 
-// The bookmarklet code that fetches from Google Sheets via the proxy
-const bookmarkletCode = `javascript:(async function(){
-    if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){
-        alert('⚠️ Aquest bookmarklet només funciona a la pàgina "links" de Clickedu.');
-        return;
-    }
-    
+// --- 1. RAW BOOKMARKLET JAVASCRIPT CODE ---
+const rawBookmarkletJS = `(async function(){
+    if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){
+        alert('⚠️ Aquest bookmarklet només funciona a la pàgina "links" de Clickedu.');
+        return;
+    }
+    
     // Define the color map inside the bookmarklet code
     const COLOR_MAP = {
         '1': { main: '#4CAF50', hover: '#388E3C' },
@@ -136,120 +136,125 @@ const bookmarkletCode = `javascript:(async function(){
         'default': { main: '#007bff', hover: '#0056b3' }
     };
 
-    // UI Cleanup (Hiding the existing form)
-    let formNode=null,containerNode=null;
-    const formXPath='//form[@action="https://shorturl.at/anS1H"]';
-    formNode=document.evaluate(formXPath,document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
-    if(formNode){
-        containerNode=formNode.closest('.bloc-info-sumari');
-        if(containerNode){
-            containerNode.style.display='none';
-        }else{
-            formNode.style.display='none';
-        }
-    }
-    
-    // Floating Button Setup
-    const btn=document.createElement('button');
-    btn.textContent='📂 Mostrar documents';
-    Object.assign(btn.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s,opacity .3s',fontWeight:'bold',opacity:'1'});
-    btn.onmouseover=function(){btn.style.background='#0056b3'};
-    btn.onmouseout=function(){btn.style.background='#007bff'};
-    document.body.appendChild(btn);
+    // UI Cleanup (Hiding the existing form)
+    let formNode=null,containerNode=null;
+    const formXPath='//form[@action="https://shorturl.at/anS1H"]';
+    formNode=document.evaluate(formXPath,document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
+    if(formNode){
+        containerNode=formNode.closest('.bloc-info-sumari');
+        if(containerNode){
+            containerNode.style.display='none';
+        }else{
+            formNode.style.display='none';
+        }
+    }
+    
+    // Floating Button Setup
+    const btn=document.createElement('button');
+    btn.textContent='📂 Mostrar documents';
+    Object.assign(btn.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s,opacity .3s',fontWeight:'bold',opacity:'1'});
+    btn.onmouseover=function(){btn.style.background='#0056b3'};
+    btn.onmouseout=function(){btn.style.background='#007bff'};
+    document.body.appendChild(btn);
 
-    let overlayVisible=!1;
-    btn.onclick=async function(){
-        // Hide existing element
-        if(containerNode){containerNode.style.display='none'}else if(formNode){formNode.style.display='none'};
-        
-        // Toggle overlay
-        if(overlayVisible){closeOverlay();btn.style.opacity='1';return;}
-        overlayVisible=!0;
-        btn.style.opacity='0.2';
-        
-        // Overlay and Loading Message
-        const overlay=document.createElement('div');
-        Object.assign(overlay.style,{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'rgba(0,0,0,0.8)',zIndex:9998,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'20px',overflowY:'auto'});
-        overlay.addEventListener('click',e=>{e.target===overlay&&closeOverlay()});
-        
-        document.addEventListener('keydown',esc);
-        function esc(e){e.key==='Escape'&&closeOverlay()}
-        function closeOverlay(){overlay.remove();document.removeEventListener('keydown',esc);overlayVisible=!1;btn.style.opacity='1'}
-        
-        const loadingMsg=document.createElement('div');
-        loadingMsg.textContent='⏳ Carregant documents (via proxy)...';
-        Object.assign(loadingMsg.style,{color:'white',fontSize:'18px',marginBottom:'20px'});
-        overlay.appendChild(loadingMsg);
-        document.body.appendChild(overlay);
+    let overlayVisible=false;
+    btn.onclick=async function(){
+        // Hide existing element
+        if(containerNode){containerNode.style.display='none'}else if(formNode){formNode.style.display='none'};
+        
+        // Toggle overlay
+        if(overlayVisible){closeOverlay();btn.style.opacity='1';return;}
+        overlayVisible=true;
+        btn.style.opacity='0.2';
+        
+        // Overlay and Loading Message
+        const overlay=document.createElement('div');
+        Object.assign(overlay.style,{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'rgba(0,0,0,0.8)',zIndex:9998,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'20px',overflowY:'auto'});
+        overlay.addEventListener('click',e=>{e.target===overlay&&closeOverlay()});
+        
+        document.addEventListener('keydown',esc);
+        function esc(e){e.key==='Escape'&&closeOverlay()}
+        function closeOverlay(){overlay.remove();document.removeEventListener('keydown',esc);overlayVisible=false;btn.style.opacity='1'}
+        
+        const loadingMsg=document.createElement('div');
+        loadingMsg.textContent='⏳ Carregant documents (via proxy)...';
+        Object.assign(loadingMsg.style,{color:'white',fontSize:'18px',marginBottom:'20px'});
+        overlay.appendChild(loadingMsg);
+        document.body.appendChild(overlay);
 
-        try{
-            // Fetching the Google Sheets CSV via the CORS proxy
-            const csvUrl='${FINAL_FETCH_URL}';
-            const response=await fetch(csvUrl);
-            if(!response.ok) throw new Error('Càrrega fallida. Codi: '+response.status);
-            
-            const csvText=await response.text();
-            
-            // MODIFIED CSV PARSING LOGIC: Expecting 3 columns: Group, Label, URL
-            const lines=csvText.split('\\n').slice(1);
-            const docs=lines.filter(line=>line.trim()).map(line=>{
-                // Splits on comma but respects quoted fields
-                const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
-                
-                if(parts.length >= 3){
-                    return{g:parts[0], l:parts[1], u:parts[2]} // g=Group, l=Label, u=URL
-                }
-                return null; // Invalid row
-            }).filter(doc=>doc && doc.g && doc.l && doc.u); // Filter out empty/invalid rows
+        try{
+            // Fetching the Google Sheets CSV via the CORS proxy
+            const csvUrl='${FINAL_FETCH_URL}';
+            const response=await fetch(csvUrl);
+            if(!response.ok) throw new Error('Càrrega fallida. Codi: '+response.status);
+            
+            const csvText=await response.text();
+            
+            // MODIFIED CSV PARSING LOGIC: Expecting 3 columns: Group, Label, URL
+            const lines=csvText.split('\\n').slice(1);
+            const docs=lines.filter(line=>line.trim()).map(line=>{
+                // Splits on comma but respects quoted fields
+                const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
+                
+                if(parts.length >= 3){
+                    return{g:parts[0], l:parts[1], u:parts[2]} // g=Group, l=Label, u=URL
+                }
+                return null; // Invalid row
+            }).filter(doc=>doc && doc.g && doc.l && doc.u); // Filter out empty/invalid rows
 
-            loadingMsg.remove();
-            
-            if(docs.length===0){
-                loadingMsg.textContent='⚠️ No s\\'han trobat documents vàlids al full de càlcul.';
-                loadingMsg.style.color='#ffc107';
-                overlay.appendChild(loadingMsg);
-                return;
-            }
+            loadingMsg.remove();
+            
+            if(docs.length===0){
+                loadingMsg.textContent='⚠️ No s\\'han trobat documents vàlids al full de càlcul.';
+                loadingMsg.style.color='#ffc107';
+                overlay.appendChild(loadingMsg);
+                return;
+            }
 
-            // Document Grid Rendering
-            const grid=document.createElement('div');
-            Object.assign(grid.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:'15px',maxWidth:'1200px',width:'100%'});
-            
-            docs.forEach(o=>{
-                const b=document.createElement('button');
-                b.textContent=o.l;
-                
-                // NEW: COLOR LOGIC
-                const colors = COLOR_MAP[o.g] || COLOR_MAP.default;
-                
-                Object.assign(b.style,{
-                    padding:'15px',fontSize:'16px',cursor:'pointer',borderRadius:'12px',
-                    border:'none',
-                    background:colors.main, // Set main color
-                    color:'#fff',
-                    boxShadow:'0 4px 6px rgba(0,0,0,0.2)',transition:'background .2s'
-                });
-                
-                b.onmouseover=function(){b.style.background=colors.hover}; // Set hover color
-                b.onmouseout=function(){b.style.background=colors.main};  // Revert on mouseout
-                
-                b.onclick=function(){window.open(o.u,'_blank')}; // Opens link in new tab
-                grid.appendChild(b);
-            });
-            overlay.appendChild(grid);
+            // Document Grid Rendering
+            const grid=document.createElement('div');
+            Object.assign(grid.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:'15px',maxWidth:'1200px',width:'100%'});
+            
+            docs.forEach(o=>{
+                const b=document.createElement('button');
+                b.textContent=o.l;
+                
+                // NEW: COLOR LOGIC
+                const colors = COLOR_MAP[o.g] || COLOR_MAP.default;
+                
+                Object.assign(b.style,{
+                    padding:'15px',fontSize:'16px',cursor:'pointer',borderRadius:'12px',
+                    border:'none',
+                    background:colors.main, // Set main color
+                    color:'#fff',
+                    boxShadow:'0 4px 6px rgba(0,0,0,0.2)',transition:'background .2s'
+                });
+                
+                b.onmouseover=function(){b.style.background=colors.hover}; // Set hover color
+                b.onmouseout=function(){b.style.background=colors.main};  // Revert on mouseout
+                
+                b.onclick=function(){window.open(o.u,'_blank')}; // Opens link in new tab
+                grid.appendChild(b);
+            });
+            overlay.appendChild(grid);
 
-        }catch(err){
-            loadingMsg.textContent='❌ Error crític: No s\\'ha pogut carregar la llista. Detall: '+err.message;
-            loadingMsg.style.color:'#ff6b6b';
-        }
-    };
-})();`;
+        }catch(err){
+            loadingMsg.textContent='❌ Error crític: No s\\'ha pogut carregar la llista. Detall: '+err.message;
+            loadingMsg.style.color='#ff6b6b';
+        }
+    };
+})()`.replace(/\s{2,}/g, ' ').replace(/\n/g, ''); // Remove excess whitespace/newlines
+
+// --- 2. ENCODING FOR BOOKMARKLET URI ---
+// We encode the *entire* raw JavaScript string, then prepend 'javascript:'
+const bookmarkletURI = 'javascript:' + encodeURIComponent(rawBookmarkletJS);
+
 
 // Set the href using JavaScript
-document.getElementById('bookmarkletLink').href = bookmarkletCode;
+document.getElementById('bookmarkletLink').href = bookmarkletURI;
 
-// Set the textarea content
-document.getElementById('copyBox').value = bookmarkletCode;
+// Set the textarea content (un-encoded version for easy copying/pasting by user)
+document.getElementById('copyBox').value = bookmarkletURI;
 
 // Copy to clipboard functionality
 document.getElementById('copyBtn').addEventListener('click', function() {
