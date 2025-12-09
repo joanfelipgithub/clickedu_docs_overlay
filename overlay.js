@@ -1,0 +1,70 @@
+(function() {
+    const docs = [
+        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D47_POC_PL_Projecte_linguistic_de_centre1.docx", label: "Projecte Linguístic de Centre" },
+        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D77_POC_PEC8.docx", label: "POC PEC8" },
+        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D87_POC_OC_Organigrama_del_centre.docx", label: "Organigrama del Centre" },
+        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D25_GRE_FI_Fotocopies_i_Impressions.docx", label: "Fotocòpies i Impressió" },
+        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D19_GRL_PPBA_Planol_planta_baixa_A.docx", label: "Planta Baixa A" },
+        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D20_GRL_PP1B_Planol_planta_1B.docx", label: "Planta 1B" },
+        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D21_GRL_PPS_Planol_planta_soterrani.docx", label: "Planta Soterrani" }
+    ];
+
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.backgroundColor = "rgba(0,0,0,0.6)";
+    overlay.style.zIndex = "9999";
+    overlay.style.display = "flex";
+    overlay.style.flexDirection = "column";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.padding = "20px";
+    overlay.style.overflowY = "auto";
+
+    overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closeOverlay();
+    });
+
+    function escListener(e) {
+        if (e.key === "Escape") closeOverlay();
+    }
+    document.addEventListener("keydown", escListener);
+
+    function closeOverlay() {
+        document.body.removeChild(overlay);
+        document.removeEventListener("keydown", escListener);
+    }
+
+    const container = document.createElement("div");
+    container.style.display = "grid";
+    container.style.gridTemplateColumns = "repeat(auto-fit, minmax(280px, 1fr))";
+    container.style.gap = "15px";
+    container.style.maxWidth = "1200px";
+    container.style.width = "100%";
+
+    docs.forEach(doc => {
+        const btn = document.createElement("button");
+        btn.textContent = doc.label;
+        btn.style.padding = "15px";
+        btn.style.fontSize = "16px";
+        btn.style.cursor = "pointer";
+        btn.style.borderRadius = "12px";
+        btn.style.border = "none";
+        btn.style.backgroundColor = "#007bff";
+        btn.style.color = "#fff";
+        btn.style.boxShadow = "0 4px 6px rgba(0,0,0,0.2)";
+        btn.style.transition = "0.2s";
+        btn.onmouseover = () => btn.style.backgroundColor = "#0056b3";
+        btn.onmouseout = () => btn.style.backgroundColor = "#007bff";
+
+        btn.onclick = () => window.location.href = doc.url;
+
+        container.appendChild(btn);
+    });
+
+    overlay.appendChild(container);
+    document.body.appendChild(overlay);
+})();
