@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clickedu – bookmarklet per la finestra de Documents</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Clickedu – Bookmarklet corregit</title>
 <style>
 body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f5f5; color: #333; line-height: 1.6; }
 .container { max-width: 720px; margin: auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -18,226 +18,178 @@ hr { margin: 2rem 0; border: none; border-top: 2px solid #eee; }
 </head>
 <body>
 <div class="container">
-<h1>📂 Clickedu – Finestra de documents</h1>
+<h1>📂 Clickedu – Finestra de documents (versió corregida)</h1>
 
 <div class="instruction">
-<p><strong>1️⃣ Arrossega el botó taronja de sota a la barra de marcadors del teu navegador</strong></p>
-<p>Això desa un bookmarklet que s'executarà a Clickedu per mostrar els teus documents en una finestra molt pràctica.</p>
+<p><strong>1️⃣ Arrossega el botó taronja a la barra de marcadors</strong></p>
 </div>
 
-<div style="text-align: center; padding: 20px; background: #fafafa; border-radius: 8px; margin: 1rem 0;">
+<div style="text-align:center; padding:20px; background:#fafafa; border-radius:8px; margin:1rem 0;">
 <a class="bookmarklet" id="bookmarkletLink" href="#">📂 Docs Clickedu</a>
-<p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">⬆️ Arrossega aquest botó a la barra de marcadors</p>
 </div>
 
 <div class="instruction">
-<p><strong>2️⃣ Alternativa: Copia al porta-retalls</strong></p>
-<p>Si arrossegar no funciona (mòbil o restriccions del navegador), fes clic al botó Copia de sota, després crea un marcador nou manualment i enganxa l'URL.</p>
+<p><strong>2️⃣ Alternativa: Copia el codi</strong></p>
 </div>
 
 <textarea id="copyBox" rows="4" readonly></textarea>
-<button id="copyBtn">📋 Copia al porta-retalls</button>
+<button id="copyBtn">📋 Copia</button>
 
-<hr>
-<p style="font-size: 0.9rem; color: #666;">
-<strong>ℹ️ Com funciona:</strong> Aquesta versió carrega la llista de documents automàticament des del Full de Càlcul de Google amb colors per grups i text contrastat.
-</p>
 </div>
 
 <script>
-const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByShDyfz4ShoweV80QWuoQ7wWSzZUORQ/export?format=csv&gid=0';
-const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
+const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByShDyfz4ShoweV80QWuoQ7wWSzZUORQ/export?format=csv&gid=0";
+const PROXY_URL = "https://cors.eu.org/";
 const FINAL_FETCH_URL = PROXY_URL + GOOGLE_SHEET_URL;
 
-/* ------------------- helper functions ------------------- */
-function getTextColor(bgColor){
-    const m = bgColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-    if(!m) return '#fff';
-    return (+m[3]) > 55 ? '#000' : '#fff';
+function generateGroupColors(groups) {
+  const map = {};
+  const total = groups.length;
+  groups.forEach((g, i) => {
+    const hue = Math.floor((i / total) * 360);
+    map[g] = {
+      main: `hsl(${hue},70%,50%)`,
+      hover: `hsl(${hue},80%,40%)`
+    };
+  });
+  return map;
 }
 
-function generateGroupColors(groups){
-    const map = {};
-    const total = groups.length;
-    groups.forEach((g,i)=>{
-        const hue = Math.floor((i/total)*360);
-        map[g] = { main:`hsl(${hue},70%,50%)`, hover:`hsl(${hue},80%,40%)` };
-    });
-    return map;
-}
+(async function buildBookmarklet() {
+  let fetchedColorMap = {};
+  try {
+    const resp = await fetch(FINAL_FETCH_URL);
+    if (!resp.ok) throw new Error("Error carregant CSV");
+    const csv = await resp.text();
+    const lines = csv.split("\n").slice(1);
 
-/* ----------------- build the bookmarklet code ---------------- */
-(async function generateBookmarkletURI(){
-    let fetchedColorMap = {};
+    const groups = Array.from(new Set(
+      lines
+        .filter(l => l.trim())
+        .map(l => l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)[0].trim())
+        .filter(g => g)
+    ));
 
-    try{
-        // 1. Fetch CSV to determine groups for color generation
-        const resp = await fetch(FINAL_FETCH_URL);
-        // Escaping the apostrophe in the error message for safety
-        if(!resp.ok) throw new Error("No s\\'ha pogut carregar el full de dades. Codi: "+resp.status); 
-        const csv = await resp.text();
+    fetchedColorMap = generateGroupColors(groups);
+  } catch (e) {
+    console.error(e);
+    fetchedColorMap = { default: { main: "hsl(210,70%,50%)", hover: "hsl(210,80%,40%)" } };
+  }
 
-        const lines = csv.split('\n').slice(1);
-        const groups = Array.from(new Set(
-            lines.filter(l=>l.trim())
-                 .map(l=>l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)[0].trim())
-                 .filter(g=>g)
-        ));
-        fetchedColorMap = generateGroupColors(groups);
-    }catch(e){
-        console.error(e);
-        fetchedColorMap = { default:{ main:'hsl(210,70%,50%)', hover:'hsl(210,80%,40%)' } };
-    }
+  const bookmarkletCode = `
+    (async function(){
+      if(!location.href.includes("insscf.clickedu.eu/sumari/index.php?p=links")){
+        alert("⚠️ Aquest bookmarklet només funciona a la pàgina 'links' de Clickedu.");
+        return;
+      }
 
-    const colorMapJSON = JSON.stringify(fetchedColorMap);
-    
-    // Simplified getTextColor function for injection
-    const simplifiedGetTextColor = `function(bgColor){
-        const m=bgColor.match(/hsl\\((\\d+),\\s*(\\d+)%,\\s*(\\d+)%\\)/);
-        if(!m) return '#fff';
-        return (+m[3])>55?'#000':'#fff';
-    }`;
+      const COLOR_MAP = ${JSON.stringify(fetchedColorMap)};
 
-    /* ---- raw JavaScript that will run as a bookmarklet ---- */
-    const rawBookmarkletJS = `(async function(){
-        if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){
-            // Explicitly escaping the single quote in 'links'
-            alert("⚠️ Aquest bookmarklet només funciona a la pàgina \\'links\\' de Clickedu."); 
-            return;
-        }
+      function getTextColor(bg){
+        const m = bg.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+        if(!m) return "#fff";
+        return (+m[3]) > 55 ? "#000" : "#fff";
+      }
 
-        const COLOR_MAP=${colorMapJSON};
-        const getTextColor=${simplifiedGetTextColor};
+      const form = document.evaluate('//form[@action="https://shorturl.at/anS1H"]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      const block = form?.closest('.bloc-info-sumari');
+      if(block) block.style.display = 'none';
 
-        /* hide the original form */
-        const form=document.evaluate('//form[@action="https://shorturl.at/anS1H"]',document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
-        const container=form?.closest('.bloc-info-sumari');
-        if(container) container.style.display='none'; else if(form) form.style.display='none';
+      const toggleBtn = document.createElement('button');
+      toggleBtn.textContent = '📂 Mostrar documents';
+      Object.assign(toggleBtn.style, {
+        position: 'fixed', top: '10px', right: '10px', zIndex: 9999,
+        padding: '10px 15px', background: '#007bff', color: '#fff',
+        border: 'none', borderRadius: '8px', cursor: 'pointer'
+      });
+      document.body.appendChild(toggleBtn);
 
-        /* add the toggle button */
-        const btn=document.createElement('button');
-        btn.textContent='📂 Mostrar documents';
-        Object.assign(btn.style,{
-            position:'fixed',top:'10px',right:'10px',zIndex:9999,
-            padding:'10px 15px',background:'#007bff',color:'#fff',
-            border:'none',borderRadius:'8px',cursor:'pointer',
-            boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s,opacity .3s',
-            fontWeight:'bold',opacity:'1'
+      let open = false;
+      let overlay = null;
+
+      toggleBtn.onclick = async () => {
+        if(open){ overlay.remove(); open=false; return; }
+        open = true;
+
+        overlay = document.createElement('div');
+        Object.assign(overlay.style, {
+          position:'fixed', top:0, left:0, width:'100%', height:'100%',
+          background:'rgba(0,0,0,0.8)', zIndex:9998, display:'flex',
+          flexDirection:'column', alignItems:'center', justifyContent:'center',
+          overflowY:'auto', padding:'20px'
         });
-        btn.onmouseover=()=>btn.style.background='#0056b3';
-        btn.onmouseout=()=>btn.style.background='#007bff';
-        document.body.appendChild(btn);
+        document.body.appendChild(overlay);
 
-        let overlayVisible=false;
-        btn.onclick=async function(){
-            if(container) container.style.display='none'; else if(form) form.style.display='none';
-            if(overlayVisible){closeOverlay();return;}
+        const loading = document.createElement('div');
+        loading.textContent = '⏳ Carregant documents...';
+        loading.style.color = 'white';
+        loading.style.fontSize = '20px';
+        overlay.appendChild(loading);
 
-            overlayVisible=true;
-            btn.style.opacity='0.2';
+        try{
+          const r = await fetch('${FINAL_FETCH_URL}');
+          if(!r.ok) throw new Error('Error de càrrega');
+          const text = await r.text();
+          const rows = text.split('\n').slice(1);
 
-            const overlay=document.createElement('div');
-            Object.assign(overlay.style,{
-                position:'fixed',top:0,left:0,width:'100%',height:'100%',
-                background:'rgba(0,0,0,0.8)',zIndex:9998,
-                display:'flex',flexDirection:'column',alignItems:'center',
-                justifyContent:'center',padding:'20px',overflowY:'auto'
+          const docs = rows
+            .filter(l => l.trim())
+            .map(l => l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').trim()))
+            .filter(p => p.length >= 3)
+            .map(p => ({ g:p[0], l:p[1], u:p[2] }));
+
+          loading.remove();
+
+          const grid = document.createElement('div');
+          Object.assign(grid.style, {
+            display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(250px, 1fr))',
+            gap:'15px', width:'90%', maxWidth:'1200px'
+          });
+
+          docs.forEach(d => {
+            const docBtn = document.createElement('button');
+            docBtn.textContent = d.l;
+            const col = COLOR_MAP[d.g] || COLOR_MAP.default;
+            Object.assign(docBtn.style, {
+              padding:'15px', fontSize:'16px', borderRadius:'10px',
+              border:'none', cursor:'pointer', background:col.main,
+              color:getTextColor(col.main)
             });
-            overlay.addEventListener('click',e=>{if(e.target===overlay) closeOverlay();});
-            document.body.appendChild(overlay);
+            docBtn.onmouseover = () => { docBtn.style.background = col.hover; docBtn.style.color = getTextColor(col.hover);} ;
+            docBtn.onmouseout  = () => { docBtn.style.background = col.main;  docBtn.style.color = getTextColor(col.main);} ;
+            docBtn.onclick = () => window.open(d.u, '_blank');
+            grid.appendChild(docBtn);
+          });
 
-            const esc=e=>{if(e.key==='Escape') closeOverlay();};
-            document.addEventListener('keydown',esc);
-            function closeOverlay(){
-                overlay.remove();
-                document.removeEventListener('keydown',esc);
-                overlayVisible=false;
-                btn.style.opacity='1';
-            }
+          overlay.appendChild(grid);
+        } catch(err) {
+          loading.textContent = '❌ Error carregant documents: ' + err.message;
+          loading.style.color = '#ff6b6b';
+        }
+      };
+    })();
+  `;
 
-            const loading=document.createElement('div');
-            loading.textContent='⏳ Carregant documents...';
-            Object.assign(loading.style,{color:'white',fontSize:'18px',marginBottom:'20px'});
-            overlay.appendChild(loading);
+  const finalURI = "javascript:" + encodeURI(bookmarkletCode);
 
-            try{
-                const r=await fetch('${FINAL_FETCH_URL}');
-                if(!r.ok) throw new Error("Càrrega fallida. Codi: "+r.status);
-                const csv2=await r.text();
-                const rows=csv2.split('\\n').slice(1);
-                const docs=rows.filter(l=>l.trim()).map(l=>{
-                    const p=l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v=>v.replace(/^"|"$/g,'').trim());
-                    if(p.length>=3) return {g:p[0],l:p[1],u:p[2]};
-                }).filter(o=>o&&o.g&&o.l&&o.u);
-
-                loading.remove();
-                if(docs.length===0){
-                    const msg=document.createElement('div');
-                    // ESCAPAMENT CORREGIT: s\'han
-                    msg.textContent="⚠️ No s\\'han trobat documents vàlids al full de càlcul."; 
-                    msg.style.color='#ffc107';
-                    overlay.appendChild(msg);
-                    return;
-                }
-
-                const grid=document.createElement('div');
-                Object.assign(grid.style,{
-                    display:'grid',
-                    gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',
-                    gap:'15px',
-                    maxWidth:'1200px',
-                    width:'100%'
-                });
-
-                docs.forEach(d=>{
-                    const btn=document.createElement('button');
-                    btn.textContent=d.l;
-                    const col=COLOR_MAP[d.g]||COLOR_MAP.default;
-                    Object.assign(btn.style,{
-                        padding:'15px',
-                        fontSize:'16px',
-                        cursor:'pointer',
-                        borderRadius:'12px',
-                        border:'none',
-                        background:col.main,
-                        color:getTextColor(col.main),
-                        boxShadow:'0 4px 6px rgba(0,0,0,0.2)',
-                        transition:'background .2s'
-                    });
-                    btn.onmouseover=()=>{btn.style.background=col.hover;btn.style.color=getTextColor(col.hover);};
-                    btn.onmouseout=()=>{btn.style.background=col.main;btn.style.color=getTextColor(col.main);};
-                    btn.onclick=()=>window.open(d.u,'_blank');
-                    grid.appendChild(btn);
-                });
-                overlay.appendChild(grid);
-
-            }catch(err){
-                // ESCAPAMENT CORREGIT: s\'ha
-                loading.textContent="❌ Error crític: No s\\'ha pogut carregar. Detall: "+err.message;
-                loading.style.color='#ff6b6b';
-            }
-        };
-    })()`;
-
-    // 2. Minify the JS code to remove unnecessary whitespace/newlines
-    const minifiedJS = rawBookmarkletJS.replace(/\s{2,}/g, ' ').replace(/\n/g, ''); 
-
-    // 3. Use the robust encodeURIComponent() to safely encode the entire script
-    const finalBookmarkletURI = 'javascript:' + encodeURIComponent(minifiedJS);
-
-    // 4. Update the UI links
-    document.getElementById('bookmarkletLink').href = finalBookmarkletURI;
-    document.getElementById('copyBox').value = finalBookmarkletURI;
+  document.getElementById("bookmarkletLink").href = finalURI;
+  document.getElementById("copyBox").value = finalURI;
 })();
 
-/* -------------------- copy to clipboard logic -------------------- */
-document.getElementById('copyBtn').addEventListener('click', function(){
-    const ta=document.getElementById('copyBox'); ta.select(); ta.setSelectionRange(0,99999);
-    navigator.clipboard.writeText(ta.value).then(()=>{
-        const btn=document.getElementById('copyBtn'); btn.textContent='✅ Copiat!'; btn.style.background='#218838';
-        setTimeout(()=>{btn.textContent='📋 Copia al porta-retalls'; btn.style.background='#28a745';},2000);
-    }).catch(()=>{document.execCommand('copy'); alert('Bookmarklet copiat! Ara crea un marcador nou i enganxa\'l.')});
-});
+// Copy button
+const btn = document.getElementById("copyBtn");
+btn.onclick = () => {
+  const ta = document.getElementById("copyBox");
+  ta.select(); ta.setSelectionRange(0,99999);
+  navigator.clipboard.writeText(ta.value).then(() => {
+    btn.textContent = "✅ Copiat!";
+    btn.style.background = "#218838";
+    setTimeout(()=>{
+      btn.textContent = "📋 Copia";
+      btn.style.background = "#28a745";
+    },2000);
+  });
+};
 </script>
 </body>
 </html>
