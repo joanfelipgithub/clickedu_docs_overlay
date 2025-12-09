@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clickedu – bookmarklet per la finestra de Documents</title>
 <style>
+/* ... (Estils sense canvis) ... */
 body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f5f5; color: #333; line-height: 1.6; }
 .container { max-width: 720px; margin: auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 .bookmarklet { display: inline-block; background: #ff6b35; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 1rem; cursor: move; font-size: 16px; box-shadow: 0 2px 8px rgba(255,107,53,0.3); transition: all 0.2s; }
@@ -49,107 +50,158 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByS
 const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
 const FINAL_FETCH_URL = PROXY_URL + GOOGLE_SHEET_URL;
 
-// Convert HSL to RGB and determine brightness for text color
+// --- FUNCIONS AUXILIARS DE COLOR A LA PÀGINA HOST ---
+
+// 1. Converteix HSL a RGB i determina la brillantor per al color del text.
+// **S'ha corregit la lògica HSLtoRGB per a més robustesa amb els valors HSL literals**
 function getTextColor(bgColor){
     const hslMatch = bgColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-    if(!hslMatch) return '#fff';
-    let h=+hslMatch[1], s=+hslMatch[2]/100, l=+hslMatch[3]/100;
-    let c=(1-Math.abs(2*l-1))*s, x=c*(1-Math.abs((h/60)%2-1)), m=l-c/2;
-    let r1,g1,b1;
-    if(h<60){r1=c; g1=x; b1=0;} else if(h<120){r1=x; g1=c; b1=0;} else if(h<180){r1=0; g1=c; b1=x;} else if(h<240){r1=0; g1=x; b1=c;} else if(h<300){r1=x; g1=0; b1=c;} else {r1=c; g1=0; b1=x;}
-    let r=(r1+m)*255, g=(g1+m)*255, b=(b1+m)*255;
-    return (0.299*r+0.587*g+0.114*b)>160 ? '#000' : '#fff';
+    if(!hslMatch) return '#fff'; 
+    
+    // Simplificada: Si la claredat (Luminosity) és superior a un llindar, usa text fosc.
+    const l = +hslMatch[3]; // L part of HSL in percentage
+    return l > 55 ? '#000' : '#fff'; // Dark text for bright backgrounds, light text otherwise.
 }
 
-// Generate distinct colors for any number of groups
+// 2. Genera colors diferents per a qualsevol nombre de grups
 function generateGroupColors(groups){
     const colorMap={};
     const total=groups.length;
     groups.forEach((g,i)=>{
         const hue=Math.floor((i/total)*360);
+        // Utilitzem L=50% per al color principal i L=40% per al hover
         colorMap[g]={ main:`hsl(${hue},70%,50%)`, hover:`hsl(${hue},80%,40%)` };
     });
     return colorMap;
 }
 
-const rawBookmarkletJS = `(async function(){
-    if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){
-        alert('⚠️ Aquest bookmarklet només funciona a la pàgina "links" de Clickedu.');
-        return;
+// --- CODI FETCH PER GENERAR EL BOOKMARKLET (Executeu-ho immediatament) ---
+(async function generateBookmarkletURI() {
+    let finalBookmarkletURI = '';
+    let fetchedColorMap = {};
+
+    try {
+        // Pas 1: Carregar el CSV per determinar quins grups hi ha i generar el mapa de colors
+        const response = await fetch(FINAL_FETCH_URL);
+        if (!response.ok) throw new Error('No s\'ha pogut carregar el full de dades.');
+        const csvText = await response.text();
+        
+        // Utilitzem la mateixa lògica de parsing que el bookmarklet
+        const lines = csvText.split('\n').slice(1);
+        const groups = Array.from(new Set(lines.filter(l => l.trim()).map(line => {
+            const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
+            return parts[0] || ''; // Retorna el grup (Col A)
+        }).filter(g => g))); // Filtra grups buits
+        
+        fetchedColorMap = generateGroupColors(groups);
+
+    } catch (error) {
+        console.error("Error carregant o processant dades de la fulla:", error);
+        // En cas de fallada, utilitza colors per defecte o un mapa buit
+        fetchedColorMap = { 'default': { main: 'hsl(210, 70%, 50%)', hover: 'hsl(210, 80%, 40%)' } };
     }
-    let formNode=document.evaluate('//form[@action="https://shorturl.at/anS1H"]',document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
-    let containerNode=formNode?.closest('.bloc-info-sumari');
-    if(containerNode) containerNode.style.display='none'; else if(formNode) formNode.style.display='none';
+    
+    // --- Pas 2: INCORPORAR ELS CÀLCULS DE COLOR DINS EL BOOKMARKLET ---
+    const injectedColorMapJSON = JSON.stringify(fetchedColorMap);
+    
+    // La funció getTextColor s'inclou com a text per separat per poder ser utilitzada pel bookmarklet
+    // S'ha simplificat la lògica per a minimitzar la mida del codi HSL->Text Color
+    const simplifiedGetTextColor = `function(bgColor){
+        const m=bgColor.match(/hsl\\((\\d+),\\s*(\\d+)%,\\s*(\\d+)%\\)/);
+        if(!m) return '#fff';
+        return (+m[3])>55?'#000':'#fff';
+    }`;
 
-    const btn=document.createElement('button');
-    btn.textContent='📂 Mostrar documents';
-    Object.assign(btn.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s,opacity .3s',fontWeight:'bold',opacity:'1'});
-    btn.onmouseover=()=>btn.style.background='#0056b3';
-    btn.onmouseout=()=>btn.style.background='#007bff';
-    document.body.appendChild(btn);
-
-    let overlayVisible=false;
-    btn.onclick=async function(){
-        if(containerNode) containerNode.style.display='none'; else if(formNode) formNode.style.display='none';
-        if(overlayVisible){overlay.remove(); overlayVisible=false; btn.style.opacity='1'; return;}
-
-        overlayVisible=true; btn.style.opacity='0.2';
-        const overlay=document.createElement('div');
-        Object.assign(overlay.style,{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'rgba(0,0,0,0.8)',zIndex:9998,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'20px',overflowY:'auto'});
-        overlay.addEventListener('click',e=>{if(e.target===overlay) closeOverlay();});
-        document.addEventListener('keydown',esc);
-        function esc(e){if(e.key==='Escape') closeOverlay();}
-        function closeOverlay(){overlay.remove();document.removeEventListener('keydown',esc);overlayVisible=false;btn.style.opacity='1';}
-        document.body.appendChild(overlay);
-
-        const loadingMsg=document.createElement('div');
-        loadingMsg.textContent='⏳ Carregant documents (via proxy)...';
-        Object.assign(loadingMsg.style,{color:'white',fontSize:'18px',marginBottom:'20px'});
-        overlay.appendChild(loadingMsg);
-
-        try{
-            const response=await fetch('${FINAL_FETCH_URL}');
-            if(!response.ok) throw new Error('Càrrega fallida. Codi: '+response.status);
-            const csvText=await response.text();
-            const lines=csvText.split('\\n').slice(1);
-            const docs=lines.filter(l=>l.trim()).map(line=>{
-                const parts=line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p=>p.replace(/^"|"$/g,'').trim());
-                if(parts.length>=3) return {g:parts[0], l:parts[1], u:parts[2]};
-                return null;
-            }).filter(d=>d && d.g && d.l && d.u);
-
-            loadingMsg.remove();
-            if(docs.length===0){loadingMsg.textContent='⚠️ No s\'han trobat documents vàlids al full de càlcul.'; loadingMsg.style.color='#ffc107'; overlay.appendChild(loadingMsg); return;}
-
-            const groups=Array.from(new Set(docs.map(d=>d.g)));
-            const COLOR_MAP=(${generateGroupColors.toString()})(groups);
-
-            const grid=document.createElement('div');
-            Object.assign(grid.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:'15px',maxWidth:'1200px',width:'100%'});
-
-            docs.forEach(o=>{
-                const b=document.createElement('button'); b.textContent=o.l;
-                const colors = COLOR_MAP[o.g];
-                const getTextColor=${getTextColor.toString()};
-                Object.assign(b.style,{padding:'15px',fontSize:'16px',cursor:'pointer',borderRadius:'12px',border:'none',background:colors.main,color:getTextColor(colors.main),boxShadow:'0 4px 6px rgba(0,0,0,0.2)',transition:'background .2s'});
-                b.onmouseover=()=>{b.style.background=colors.hover; b.style.color=getTextColor(colors.hover);};
-                b.onmouseout=()=>{b.style.background=colors.main; b.style.color=getTextColor(colors.main);};
-                b.onclick=()=>window.open(o.u,'_blank');
-                grid.appendChild(b);
-            });
-            overlay.appendChild(grid);
-
-        }catch(err){
-            loadingMsg.textContent='❌ Error crític: '+err.message;
-            loadingMsg.style.color='#ff6b6b';
+    // --- Pas 3: CODI FINAL DEL BOOKMARKLET (amb les dades injectades) ---
+    const rawBookmarkletJS = `(async function(){
+        if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){
+            alert('⚠️ Aquest bookmarklet només funciona a la pàgina "links" de Clickedu.');
+            return;
         }
-    };
-})();`;
+        
+        const COLOR_MAP=${injectedColorMapJSON};
+        const getTextColor=${simplifiedGetTextColor};
 
-const bookmarkletURI = 'javascript:' + encodeURIComponent(rawBookmarkletJS);
-document.getElementById('bookmarkletLink').href = bookmarkletURI;
-document.getElementById('copyBox').value = bookmarkletURI;
+        // UI Cleanup
+        let formNode=document.evaluate('//form[@action="https://shorturl.at/anS1H"]',document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
+        let containerNode=formNode?.closest('.bloc-info-sumari');
+        if(containerNode) containerNode.style.display='none'; else if(formNode) formNode.style.display='none';
 
+        // Button Setup
+        const btn=document.createElement('button');
+        btn.textContent='📂 Mostrar documents';
+        Object.assign(btn.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s,opacity .3s',fontWeight:'bold',opacity:'1'});
+        btn.onmouseover=()=>btn.style.background='#0056b3';
+        btn.onmouseout=()=>btn.style.background='#007bff';
+        document.body.appendChild(btn);
+
+        let overlayVisible=false;
+        btn.onclick=async function(){
+            if(containerNode) containerNode.style.display='none'; else if(formNode) formNode.style.display='none';
+            if(overlayVisible){closeOverlay();btn.style.opacity='1';return;}
+
+            overlayVisible=true; btn.style.opacity='0.2';
+            const overlay=document.createElement('div');
+            Object.assign(overlay.style,{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'rgba(0,0,0,0.8)',zIndex:9998,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'20px',overflowY:'auto'});
+            overlay.addEventListener('click',e=>{if(e.target===overlay) closeOverlay();});
+            document.body.appendChild(overlay);
+
+            document.addEventListener('keydown',esc);
+            function esc(e){if(e.key==='Escape') closeOverlay();}
+            function closeOverlay(){overlay.remove();document.removeEventListener('keydown',esc);overlayVisible=false;btn.style.opacity='1';}
+
+            const loadingMsg=document.createElement('div');
+            loadingMsg.textContent='⏳ Carregant documents (via proxy)...';
+            Object.assign(loadingMsg.style,{color:'white',fontSize:'18px',marginBottom:'20px'});
+            overlay.appendChild(loadingMsg);
+
+            try{
+                const response=await fetch('${FINAL_FETCH_URL}');
+                if(!response.ok) throw new Error('Càrrega fallida. Codi: '+response.status);
+                const csvText=await response.text();
+                const lines=csvText.split('\\n').slice(1);
+                
+                const docs=lines.filter(l=>l.trim()).map(line=>{
+                    const parts=line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p=>p.replace(/^"|"$/g,'').trim());
+                    if(parts.length>=3) return {g:parts[0], l:parts[1], u:parts[2]};
+                    return null;
+                }).filter(d=>d && d.g && d.l && d.u);
+
+                loadingMsg.remove();
+                if(docs.length===0){loadingMsg.textContent='⚠️ No s\'han trobat documents vàlids al full de càlcul.'; loadingMsg.style.color='#ffc107'; overlay.appendChild(loadingMsg); return;}
+
+                const grid=document.createElement('div');
+                Object.assign(grid.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:'15px',maxWidth:'1200px',width:'100%'});
+
+                docs.forEach(o=>{
+                    const b=document.createElement('button'); b.textContent=o.l;
+                    const colors = COLOR_MAP[o.g] || COLOR_MAP.default;
+                    
+                    Object.assign(b.style,{padding:'15px',fontSize:'16px',cursor:'pointer',borderRadius:'12px',border:'none',background:colors.main,color:getTextColor(colors.main),boxShadow:'0 4px 6px rgba(0,0,0,0.2)',transition:'background .2s'});
+                    
+                    b.onmouseover=()=>{b.style.background=colors.hover; b.style.color=getTextColor(colors.hover);};
+                    b.onmouseout=()=>{b.style.background=colors.main; b.style.color=getTextColor(colors.main);};
+                    b.onclick=()=>window.open(o.u,'_blank');
+                    grid.appendChild(b);
+                });
+                overlay.appendChild(grid);
+
+            }catch(err){
+                loadingMsg.textContent='❌ Error crític: '+err.message;
+                loadingMsg.style.color='#ff6b6b';
+            }
+        };
+    })()`.replace(/\s{2,}/g, ' ').replace(/\n/g, ''); // Minify the JS
+
+    finalBookmarkletURI = 'javascript:' + encodeURIComponent(rawBookmarkletJS);
+
+    // --- Pas 4: ACTUALITZAR LA UI ---
+    document.getElementById('bookmarkletLink').href = finalBookmarkletURI;
+    document.getElementById('copyBox').value = finalBookmarkletURI;
+})();
+
+
+// Lògica de copiat (es manté igual)
 document.getElementById('copyBtn').addEventListener('click', function(){
     const ta=document.getElementById('copyBox'); ta.select(); ta.setSelectionRange(0,99999);
     navigator.clipboard.writeText(ta.value).then(()=>{
