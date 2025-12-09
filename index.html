@@ -2,86 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Docs Overlay</title>
+  <title>Clickedu with Docs Overlay</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    #clickedu-frame {
+      flex: 1;
+      border: none;
+      width: 100%;
+    }
+    #overlay-section {
+      background: #f9f9f9;
+      padding: 20px;
+      border-top: 3px solid #007bff;
+    }
+    #overlay-section h2 {
+      color: #007bff;
+      margin-top: 0;
+    }
+    .doc-btn {
+      padding: 10px;
+      margin: 5px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: 0.2s;
+    }
+    .doc-btn:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <script>
-    (function() {
-      const docs = [
-        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D47_POC_PL_Projecte_linguistic_de_centre1.docx", label: "Projecte Linguístic de Centre" },
-        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D77_POC_PEC8.docx", label: "POC PEC8" },
-        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D87_POC_OC_Organigrama_del_centre.docx", label: "Organigrama del Centre" },
-        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D25_GRE_FI_Fotocopies_i_Impressions.docx", label: "Fotocòpies i Impressió" },
-        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D19_GRL_PPBA_Planol_planta_baixa_A.docx", label: "Planta Baixa A" },
-        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D20_GRL_PP1B_Planol_planta_1B.docx", label: "Planta 1B" },
-        { url: "https://insscf.clickedu.eu/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D21_GRL_PPS_Planol_planta_soterrani.docx", label: "Planta Soterrani" }
-      ];
+  <!-- Section 1: Clickedu page -->
+  <iframe id="clickedu-frame" src="https://insscf.clickedu.eu/sumari/index.php?p=links"></iframe>
 
-      const overlay = document.createElement("div");
-      overlay.style.position = "fixed";
-      overlay.style.top = "0";
-      overlay.style.left = "0";
-      overlay.style.width = "100%";
-      overlay.style.height = "100%";
-      overlay.style.backgroundColor = "rgba(0,0,0,0.6)";
-      overlay.style.zIndex = "9999";
-      overlay.style.display = "flex";
-      overlay.style.flexDirection = "column";
-      overlay.style.alignItems = "center";
-      overlay.style.justifyContent = "center";
-      overlay.style.padding = "20px";
-      overlay.style.overflowY = "auto";
-
-      overlay.addEventListener("click", (e) => {
-        if (e.target === overlay) closeOverlay();
-      });
-
-      function escListener(e) {
-        if (e.key === "Escape") closeOverlay();
-      }
-      document.addEventListener("keydown", escListener);
-
-      function closeOverlay() {
-        document.body.removeChild(overlay);
-        document.removeEventListener("keydown", escListener);
-      }
-
-      const container = document.createElement("div");
-      container.style.display = "grid";
-      container.style.gridTemplateColumns = "repeat(auto-fit, minmax(280px, 1fr))";
-      container.style.gap = "15px";
-      container.style.maxWidth = "1200px";
-      container.style.width = "100%";
-
-      docs.forEach(doc => {
-        const btn = document.createElement("button");
-        btn.textContent = doc.label;
-        btn.style.padding = "15px";
-        btn.style.fontSize = "16px";
-        btn.style.cursor = "pointer";
-        btn.style.borderRadius = "12px";
-        btn.style.border = "none";
-        btn.style.backgroundColor = "#007bff";
-        btn.style.color = "#fff";
-        btn.style.boxShadow = "0 4px 6px rgba(0,0,0,0.2)";
-        btn.style.transition = "0.2s";
-        btn.onmouseover = () => btn.style.backgroundColor = "#0056b3";
-        btn.onmouseout = () => btn.style.backgroundColor = "#007bff";
-
-        btn.onclick = () => window.open(doc.url, "_blank");
-
-        container.appendChild(btn);
-      });
-
-      overlay.appendChild(container);
-      document.body.appendChild(overlay);
-    })();
-  </script>
+  <!-- Section 2: Overlay with documents -->
+  <div id="overlay-section">
+    <h2>Documents Overlay</h2>
+    <button class="doc-btn" onclick="window.open('/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D47_POC_PL_Projecte_linguistic_de_centre1.docx','_blank')">Projecte Linguístic de Centre</button>
+    <button class="doc-btn" onclick="window.open('/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D77_POC_PEC8.docx','_blank')">POC PEC8</button>
+    <button class="doc-btn" onclick="window.open('/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D87_POC_OC_Organigrama_del_centre.docx','_blank')">Organigrama del Centre</button>
+    <button class="doc-btn" onclick="window.open('/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D25_GRE_FI_Fotocopies_i_Impressions.docx','_blank')">Fotocòpies i Impressió</button>
+    <button class="doc-btn" onclick="window.open('/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D19_GRL_PPBA_Planol_planta_baixa_A.docx','_blank')">Planta Baixa A</button>
+    <button class="doc-btn" onclick="window.open('/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D20_GRL_PP1B_Planol_planta_1B.docx','_blank')">Planta 1B</button>
+    <button class="doc-btn" onclick="window.open('/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D21_GRL_PPS_Planol_planta_soterrani.docx','_blank')">Planta Soterrani</button>
+  </div>
 </body>
 </html>
