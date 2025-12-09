@@ -1,61 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ca">
 <head>
   <meta charset="UTF-8">
-  <title>Clickedu with Docs Overlay</title>
+  <title>Clickedu – Documents overlay</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+    body{
+      font-family:Arial,Helvetica,sans-serif;
+      margin:2rem;
+      background:#f5f5f5;
+      color:#333;
     }
-    #clickedu-frame {
-      flex: 1;
-      border: none;
-      width: 100%;
+    h1{
+      color:#007bff;
     }
-    #overlay-section {
-      background: #f9f9f9;
-      padding: 20px;
-      border-top: 3px solid #007bff;
+    .bookmarklet{
+      display:inline-block;
+      background:#007bff;
+      color:#fff;
+      padding:.6rem 1rem;
+      border-radius:6px;
+      text-decoration:none;
+      font-weight:bold;
+      margin-top:1rem;
     }
-    #overlay-section h2 {
-      color: #007bff;
-      margin-top: 0;
+    .bookmarklet:hover{
+      background:#0056b3;
     }
-    .doc-btn {
-      padding: 10px;
-      margin: 5px;
-      font-size: 14px;
-      border: none;
-      border-radius: 8px;
-      background-color: #007bff;
-      color: #fff;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: 0.2s;
+    .copyBtn{
+      margin-left:1rem;
+      padding:.4rem .8rem;
+      font-size:.9rem;
+      cursor:pointer;
     }
-    .doc-btn:hover {
-      background-color: #0056b3;
+    pre{
+      background:#fff;
+      padding:1rem;
+      border:1px solid #ddd;
+      overflow:auto;
     }
   </style>
 </head>
 <body>
-  <!-- Section 1: Clickedu page -->
-  <iframe id="clickedu-frame" src="https://insscf.clickedu.eu/sumari/index.php?p=links"></iframe>
+  <h1>Documents overlay for Clickedu</h1>
 
-  <!-- Section 2: Overlay with documents -->
-  <div id="overlay-section">
-    <h2>Documents Overlay</h2>
-    <button class="doc-btn" onclick="window.open('https://insscf.clickedu.eu//private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D47_POC_PL_Projecte_linguistic_de_centre1.docx','_blank')">Projecte Linguístic de Centre</button>
-    <button class="doc-btn" onclick="window.open('https://insscf.clickedu.eu//private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D77_POC_PEC8.docx','_blank')">POC PEC8</button>
-    <button class="doc-btn" onclick="window.open('https://insscf.clickedu.eu//private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D87_POC_OC_Organigrama_del_centre.docx','_blank')">Organigrama del Centre</button>
-    <button class="doc-btn" onclick="window.open('https://insscf.clickedu.eu//private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D25_GRE_FI_Fotocopies_i_Impressions.docx','_blank')">Fotocòpies i Impressió</button>
-    <button class="doc-btn" onclick="window.open('https://insscf.clickedu.eu//private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D19_GRL_PPBA_Planol_planta_baixa_A.docx','_blank')">Planta Baixa A</button>
-    <button class="doc-btn" onclick="window.open('https://insscf.clickedu.eu//private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D20_GRL_PP1B_Planol_planta_1B.docx','_blank')">Planta 1B</button>
-    <button class="doc-btn" onclick="window.open('https://insscf.clickedu.eu//private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D21_GRL_PPS_Planol_planta_soterrani.docx','_blank')">Planta Soterrani</button>
-  </div>
+  <p>
+    <strong>Step 1 – Drag the button below to your bookmarks bar</strong> (or right‑click → “Bookmark this link”).  
+    The button will be stored as a *bookmarklet* – a tiny piece of JavaScript that runs on the page you’re viewing.
+  </p>
+
+  <!-- THE BOOKMARKLET -->
+  <a class="bookmarklet"
+     href="javascript:(function(){const d=[{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D47_POC_PL_Projecte_linguistic_de_centre1.docx',l:'Projecte Linguístic de Centre'},{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D77_POC_PEC8.docx',l:'POC PEC8'},{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D87_POC_OC_Organigrama_del_centre.docx',l:'Organigrama del Centre'},{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D25_GRE_FI_Fotocopies_i_Impressions.docx',l:'Fotocòpies i Impressió'},{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D19_GRL_PPBA_Planol_planta_baixa_A.docx',l:'Planta Baixa A'},{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D20_GRL_PP1B_Planol_planta_1B.docx',l:'Planta 1B'},{u:'/private/insscf.clickedu.eu/arxius/carpetes/documents_validats/39/D21_GRL_PPS_Planol_planta_soterrani.docx',l:'Planta Soterrani'}];const t=document.createElement('button');t.textContent='📂 Mostra Documents';Object.assign(t.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',boxShadow:'0 2px 4px rgba(0,0,0,.2)'});document.body.appendChild(t);const p=document.createElement('div');Object.assign(p.style,{background:'#f9f9f9',padding:'20px',marginTop:'60px',border:'2px solid #007bff',borderRadius:'12px',display:'none'});const h=document.createElement('h2');h.textContent='Documents overlay';h.style.color='#007bff';p.appendChild(h);const g=document.createElement('div');Object.assign(g.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:'10px'});d.forEach(i=>{const b=document.createElement('button');b.textContent=i.l;Object.assign(b.style,{padding:'10px',fontSize:'14px',cursor:'pointer',borderRadius:'8px',border:'none',background:'#007bff',color:'#fff',boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s'});b.onmouseover=()=>b.style.background='#0056b3';b.onmouseout=()=>b.style.background='#007bff';b.onclick=()=>window.location.href=i.u;g.appendChild(b);});p.appendChild(g);document.body.appendChild(p);t.addEventListener('click',()=>{if(p.style.display==='none'){p.style.display='block';t.textContent='📂 Amaga Documents';}else{p.style.display='none';t.textContent='📂 Mostra Documents';}});})();"
+     title="Drag me to your bookmarks bar">
+    📂 Click‑edu Docs overlay
+  </a>
+
+  <!-- optional copy‑to‑clipboard button for people who can’t drag -->
+  <button id="copyBtn" class="copyBtn">Copy URL</button>
+
+  <p>
+    <strong>Step 2 – Open Clickedu (log in first)</strong>  
+    Example page: <code>https://insscf.clickedu.eu/sumari/index.php?p=links</code>
+  </p>
+
+  <p>
+    <strong>Step 3 – Click the bookmarklet</strong> while you are on the Clickedu page.  
+    A floating button “📂 Mostra Documents” appears. Click it – the panel with all document buttons slides down.  
+    Clicking a document button downloads the file **without a 403 error**, because the request is made from the same Clickedu origin.
+  </p>
+
+  <h2>Why this works</h2>
+  <ul>
+    <li>The bookmarklet runs **inside the Clickedu domain**, so the browser automatically sends the session cookies.</li>
+    <li>No iframe, no <code>window.open</code> tricks – all blocked by Clickedu’s <code>X‑Frame‑Options: SAMEORIGIN</code>.</li>
+    <li>The only thing you need to host on HTTPS is this landing page (GitHub Pages or Google Sites). The overlay code never leaves Clickedu.</li>
+  </ul>
+
+  <h2>Google Sites button (optional)</h2>
+  <p>
+    If you want a Google Sites button that points to this page, simply set the button’s link to  
+    <code>https://joanfelipgithub.github.io/clickedu_docs_overlay/</code>.  
+    Users will land on the landing page, drag the bookmarklet, then follow steps 2‑3.
+  </p>
+
+  <footer style="margin-top:2rem;font-size:0.9em;color:#666;">
+    Created by Joan Felipe – 2025
+  </footer>
+
+  <script>
+    // Copy‑to‑clipboard helper (for people who can’t drag)
+    document.getElementById('copyBtn').onclick = function () {
+      const url = document.querySelector('.bookmarklet').href;
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Bookmarklet URL copied! Create a new bookmark and paste the URL into it.');
+      });
+    };
+  </script>
 </body>
 </html>
