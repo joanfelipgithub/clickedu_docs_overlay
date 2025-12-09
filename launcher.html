@@ -1,0 +1,22 @@
+<script>
+// This script finds the top-level page and injects the overlay script
+// Note: This relies on the current page being in the same domain 
+// or allowing cross-domain communication, which is RARE.
+
+try {
+    if (window.top !== window.self) {
+        // We are inside an iframe. Try to inject script into the parent.
+        var parentDocument = window.parent.document;
+        var s = parentDocument.createElement('script');
+        s.src = 'https://raw.githubusercontent.com/joanfelipgithub/clickedu_docs_overlay/refs/heads/main/overlay-launch.html';
+        parentDocument.body.appendChild(s);
+    } else {
+        // We are in a new tab. Inject script normally.
+        var s = document.createElement('script');
+        s.src = 'https://raw.githubusercontent.com/joanfelipgithub/clickedu_docs_overlay/refs/heads/main/overlay-launch.html';
+        document.body.appendChild(s);
+    }
+} catch (e) {
+    console.error("Could not inject script into parent window:", e);
+}
+</script>
