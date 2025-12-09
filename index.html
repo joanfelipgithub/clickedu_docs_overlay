@@ -1,279 +1,161 @@
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clickedu – bookmarklet per la finestra de Documents</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 2rem;
-      background: #f5f5f5;
-      color: #333;
-      line-height: 1.6;
-    }
-    .container {
-      max-width: 720px;
-      margin: auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .bookmarklet {
-      display: inline-block;
-      background: #ff6b35;
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-      margin-top: 1rem;
-      cursor: move;
-      font-size: 16px;
-      box-shadow: 0 2px 8px rgba(255,107,53,0.3);
-      transition: all 0.2s;
-    }
-    .bookmarklet:hover {
-      background: #e55a28;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255,107,53,0.4);
-    }
-    #copyBox {
-      width: 100%;
-      padding: 0.8rem;
-      font-size: 0.85rem;
-      margin-top: 0.5rem;
-      box-sizing: border-box;
-      border: 2px solid #ddd;
-      border-radius: 4px;
-      font-family: monospace;
-      background: #f9f9f9;
-    }
-    #copyBtn {
-      margin-top: 0.5rem;
-      padding: 8px 16px;
-      background: #28a745;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
-    #copyBtn:hover {
-      background: #218838;
-    }
-    .instruction {
-      background: #e3f2fd;
-      padding: 1rem;
-      border-left: 4px solid #2196f3;
-      margin: 1rem 0;
-      border-radius: 4px;
-    }
-    hr {
-      margin: 2rem 0;
-      border: none;
-      border-top: 2px solid #eee;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clickedu – bookmarklet per la finestra de Documents</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f5f5; color: #333; line-height: 1.6; }
+.container { max-width: 720px; margin: auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.bookmarklet { display: inline-block; background: #ff6b35; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 1rem; cursor: move; font-size: 16px; box-shadow: 0 2px 8px rgba(255,107,53,0.3); transition: all 0.2s; }
+.bookmarklet:hover { background: #e55a28; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,107,53,0.4); }
+#copyBox { width: 100%; padding: 0.8rem; font-size: 0.85rem; margin-top: 0.5rem; box-sizing: border-box; border: 2px solid #ddd; border-radius: 4px; font-family: monospace; background: #f9f9f9; }
+#copyBtn { margin-top: 0.5rem; padding: 8px 16px; background: #28a745; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+#copyBtn:hover { background: #218838; }
+.instruction { background: #e3f2fd; padding: 1rem; border-left: 4px solid #2196f3; margin: 1rem 0; border-radius: 4px; }
+hr { margin: 2rem 0; border: none; border-top: 2px solid #eee; }
+</style>
 </head>
 <body>
 <div class="container">
-  <h1>📂 Clickedu – Finestra de documents</h1>
+<h1>📂 Clickedu – Finestra de documents</h1>
 
-  <div class="instruction">
-    <p><strong>1️⃣ Arrossega el botó taronja de sota a la barra de marcadors del teu navegador</strong></p>
-    <p>Això desa un bookmarklet que s'executarà a Clickedu per mostrar els teus documents en una finestra molt pràctica.</p>
-  </div>
+<div class="instruction">
+<p><strong>1️⃣ Arrossega el botó taronja de sota a la barra de marcadors del teu navegador</strong></p>
+<p>Això desa un bookmarklet que s'executarà a Clickedu per mostrar els teus documents en una finestra molt pràctica.</p>
+</div>
 
-  <div style="text-align: center; padding: 20px; background: #fafafa; border-radius: 8px; margin: 1rem 0;">
-    <a class="bookmarklet" id="bookmarkletLink" href="#">
-      📂 Docs Clickedu
-    </a>
-    <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
-      ⬆️ Arrossega aquest botó a la barra de marcadors
-    </p>
-  </div>
+<div style="text-align: center; padding: 20px; background: #fafafa; border-radius: 8px; margin: 1rem 0;">
+<a class="bookmarklet" id="bookmarkletLink" href="#">📂 Docs Clickedu</a>
+<p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">⬆️ Arrossega aquest botó a la barra de marcadors</p>
+</div>
 
-  <div class="instruction">
-    <p><strong>2️⃣ Alternativa: Copia al porta-retalls</strong></p>
-    <p>Si arrossegar no funciona (mòbil o restriccions del navegador), fes clic al botó Copia de sota, després crea un marcador nou manualment i enganxa l'URL.</p>
-  </div>
+<div class="instruction">
+<p><strong>2️⃣ Alternativa: Copia al porta-retalls</strong></p>
+<p>Si arrossegar no funciona (mòbil o restriccions del navegador), fes clic al botó Copia de sota, després crea un marcador nou manualment i enganxa l'URL.</p>
+</div>
 
-  <textarea id="copyBox" rows="4" readonly></textarea>
-  <button id="copyBtn">📋 Copia al porta-retalls</button>
+<textarea id="copyBox" rows="4" readonly></textarea>
+<button id="copyBtn">📋 Copia al porta-retalls</button>
 
-  <hr>
-  
-  <p style="font-size: 0.9rem; color: #666;">
-    <strong>ℹ️ Com funciona:</strong> Aquesta versió carrega la llista de documents automàticament des del Full de Càlcul de Google utilitzant un servidor intermediari per evitar els errors de seguretat CORS, i usa la primera columna per aplicar colors diferents.
-  </p>
+<hr>
+<p style="font-size: 0.9rem; color: #666;">
+<strong>ℹ️ Com funciona:</strong> Aquesta versió carrega la llista de documents automàticament des del Full de Càlcul de Google amb colors per grups i text contrastat.
+</p>
 </div>
 
 <script>
-// IMPORTANT: Use the /export URL format, and ensure your sheet is published to the web!
 const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByShDyfz4ShoweV80QWuoQ7wWSzZUORQ/export?format=csv&gid=0';
-
-// This CORS proxy is added to allow the fetch request to succeed from any origin.
-const PROXY_URL = 'https://cors-anywhere.herokuapp.com/'; 
+const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
 const FINAL_FETCH_URL = PROXY_URL + GOOGLE_SHEET_URL;
 
-// --- 1. RAW BOOKMARKLET JAVASCRIPT CODE ---
+// Convert HSL to RGB and determine brightness for text color
+function getTextColor(bgColor){
+    const hslMatch = bgColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+    if(!hslMatch) return '#fff';
+    let h=+hslMatch[1], s=+hslMatch[2]/100, l=+hslMatch[3]/100;
+    let c=(1-Math.abs(2*l-1))*s, x=c*(1-Math.abs((h/60)%2-1)), m=l-c/2;
+    let r1,g1,b1;
+    if(h<60){r1=c; g1=x; b1=0;} else if(h<120){r1=x; g1=c; b1=0;} else if(h<180){r1=0; g1=c; b1=x;} else if(h<240){r1=0; g1=x; b1=c;} else if(h<300){r1=x; g1=0; b1=c;} else {r1=c; g1=0; b1=x;}
+    let r=(r1+m)*255, g=(g1+m)*255, b=(b1+m)*255;
+    return (0.299*r+0.587*g+0.114*b)>160 ? '#000' : '#fff';
+}
+
+// Generate distinct colors for any number of groups
+function generateGroupColors(groups){
+    const colorMap={};
+    const total=groups.length;
+    groups.forEach((g,i)=>{
+        const hue=Math.floor((i/total)*360);
+        colorMap[g]={ main:`hsl(${hue},70%,50%)`, hover:`hsl(${hue},80%,40%)` };
+    });
+    return colorMap;
+}
+
 const rawBookmarkletJS = `(async function(){
     if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){
         alert('⚠️ Aquest bookmarklet només funciona a la pàgina "links" de Clickedu.');
         return;
     }
-    
-    // Define the color map inside the bookmarklet code
-    const COLOR_MAP = {
-        '1': { main: '#4CAF50', hover: '#388E3C' },
-        '2': { main: '#FF9800', hover: '#F57C00' },
-        '3': { main: '#00BCD4', hover: '#0097A7' },
-        '4': { main: '#E91E63', hover: '#C2185B' },
-        '5': { main: '#673AB7', hover: '#512DA8' },
-        'default': { main: '#007bff', hover: '#0056b3' }
-    };
+    let formNode=document.evaluate('//form[@action="https://shorturl.at/anS1H"]',document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
+    let containerNode=formNode?.closest('.bloc-info-sumari');
+    if(containerNode) containerNode.style.display='none'; else if(formNode) formNode.style.display='none';
 
-    // UI Cleanup (Hiding the existing form)
-    let formNode=null,containerNode=null;
-    const formXPath='//form[@action="https://shorturl.at/anS1H"]';
-    formNode=document.evaluate(formXPath,document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
-    if(formNode){
-        containerNode=formNode.closest('.bloc-info-sumari');
-        if(containerNode){
-            containerNode.style.display='none';
-        }else{
-            formNode.style.display='none';
-        }
-    }
-    
-    // Floating Button Setup
     const btn=document.createElement('button');
     btn.textContent='📂 Mostrar documents';
     Object.assign(btn.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s,opacity .3s',fontWeight:'bold',opacity:'1'});
-    btn.onmouseover=function(){btn.style.background='#0056b3'};
-    btn.onmouseout=function(){btn.style.background='#007bff'};
+    btn.onmouseover=()=>btn.style.background='#0056b3';
+    btn.onmouseout=()=>btn.style.background='#007bff';
     document.body.appendChild(btn);
 
     let overlayVisible=false;
     btn.onclick=async function(){
-        // Hide existing element
-        if(containerNode){containerNode.style.display='none'}else if(formNode){formNode.style.display='none'};
-        
-        // Toggle overlay
-        if(overlayVisible){closeOverlay();btn.style.opacity='1';return;}
-        overlayVisible=true;
-        btn.style.opacity='0.2';
-        
-        // Overlay and Loading Message
+        if(containerNode) containerNode.style.display='none'; else if(formNode) formNode.style.display='none';
+        if(overlayVisible){overlay.remove(); overlayVisible=false; btn.style.opacity='1'; return;}
+
+        overlayVisible=true; btn.style.opacity='0.2';
         const overlay=document.createElement('div');
         Object.assign(overlay.style,{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'rgba(0,0,0,0.8)',zIndex:9998,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'20px',overflowY:'auto'});
-        overlay.addEventListener('click',e=>{e.target===overlay&&closeOverlay()});
-        
+        overlay.addEventListener('click',e=>{if(e.target===overlay) closeOverlay();});
         document.addEventListener('keydown',esc);
-        function esc(e){e.key==='Escape'&&closeOverlay()}
-        function closeOverlay(){overlay.remove();document.removeEventListener('keydown',esc);overlayVisible=false;btn.style.opacity='1'}
-        
+        function esc(e){if(e.key==='Escape') closeOverlay();}
+        function closeOverlay(){overlay.remove();document.removeEventListener('keydown',esc);overlayVisible=false;btn.style.opacity='1';}
+        document.body.appendChild(overlay);
+
         const loadingMsg=document.createElement('div');
         loadingMsg.textContent='⏳ Carregant documents (via proxy)...';
         Object.assign(loadingMsg.style,{color:'white',fontSize:'18px',marginBottom:'20px'});
         overlay.appendChild(loadingMsg);
-        document.body.appendChild(overlay);
 
         try{
-            // Fetching the Google Sheets CSV via the CORS proxy
-            const csvUrl='${FINAL_FETCH_URL}';
-            const response=await fetch(csvUrl);
+            const response=await fetch('${FINAL_FETCH_URL}');
             if(!response.ok) throw new Error('Càrrega fallida. Codi: '+response.status);
-            
             const csvText=await response.text();
-            
-            // MODIFIED CSV PARSING LOGIC: Expecting 3 columns: Group, Label, URL
             const lines=csvText.split('\\n').slice(1);
-            const docs=lines.filter(line=>line.trim()).map(line=>{
-                // Splits on comma but respects quoted fields
-                const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
-                
-                if(parts.length >= 3){
-                    return{g:parts[0], l:parts[1], u:parts[2]} // g=Group, l=Label, u=URL
-                }
-                return null; // Invalid row
-            }).filter(doc=>doc && doc.g && doc.l && doc.u); // Filter out empty/invalid rows
+            const docs=lines.filter(l=>l.trim()).map(line=>{
+                const parts=line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p=>p.replace(/^"|"$/g,'').trim());
+                if(parts.length>=3) return {g:parts[0], l:parts[1], u:parts[2]};
+                return null;
+            }).filter(d=>d && d.g && d.l && d.u);
 
             loadingMsg.remove();
-            
-            if(docs.length===0){
-                loadingMsg.textContent='⚠️ No s\\'han trobat documents vàlids al full de càlcul.';
-                loadingMsg.style.color='#ffc107';
-                overlay.appendChild(loadingMsg);
-                return;
-            }
+            if(docs.length===0){loadingMsg.textContent='⚠️ No s\'han trobat documents vàlids al full de càlcul.'; loadingMsg.style.color='#ffc107'; overlay.appendChild(loadingMsg); return;}
 
-            // Document Grid Rendering
+            const groups=Array.from(new Set(docs.map(d=>d.g)));
+            const COLOR_MAP=(${generateGroupColors.toString()})(groups);
+
             const grid=document.createElement('div');
             Object.assign(grid.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:'15px',maxWidth:'1200px',width:'100%'});
-            
+
             docs.forEach(o=>{
-                const b=document.createElement('button');
-                b.textContent=o.l;
-                
-                // NEW: COLOR LOGIC
-                const colors = COLOR_MAP[o.g] || COLOR_MAP.default;
-                
-                Object.assign(b.style,{
-                    padding:'15px',fontSize:'16px',cursor:'pointer',borderRadius:'12px',
-                    border:'none',
-                    background:colors.main, // Set main color
-                    color:'#fff',
-                    boxShadow:'0 4px 6px rgba(0,0,0,0.2)',transition:'background .2s'
-                });
-                
-                b.onmouseover=function(){b.style.background=colors.hover}; // Set hover color
-                b.onmouseout=function(){b.style.background=colors.main};  // Revert on mouseout
-                
-                b.onclick=function(){window.open(o.u,'_blank')}; // Opens link in new tab
+                const b=document.createElement('button'); b.textContent=o.l;
+                const colors = COLOR_MAP[o.g];
+                const getTextColor=${getTextColor.toString()};
+                Object.assign(b.style,{padding:'15px',fontSize:'16px',cursor:'pointer',borderRadius:'12px',border:'none',background:colors.main,color:getTextColor(colors.main),boxShadow:'0 4px 6px rgba(0,0,0,0.2)',transition:'background .2s'});
+                b.onmouseover=()=>{b.style.background=colors.hover; b.style.color=getTextColor(colors.hover);};
+                b.onmouseout=()=>{b.style.background=colors.main; b.style.color=getTextColor(colors.main);};
+                b.onclick=()=>window.open(o.u,'_blank');
                 grid.appendChild(b);
             });
             overlay.appendChild(grid);
 
         }catch(err){
-            loadingMsg.textContent='❌ Error crític: No s\\'ha pogut carregar la llista. Detall: '+err.message;
+            loadingMsg.textContent='❌ Error crític: '+err.message;
             loadingMsg.style.color='#ff6b6b';
         }
     };
-})()`.replace(/\s{2,}/g, ' ').replace(/\n/g, ''); // Remove excess whitespace/newlines
+})();`;
 
-// --- 2. ENCODING FOR BOOKMARKLET URI ---
-// We encode the *entire* raw JavaScript string, then prepend 'javascript:'
 const bookmarkletURI = 'javascript:' + encodeURIComponent(rawBookmarkletJS);
-
-
-// Set the href using JavaScript
 document.getElementById('bookmarkletLink').href = bookmarkletURI;
-
-// Set the textarea content (un-encoded version for easy copying/pasting by user)
 document.getElementById('copyBox').value = bookmarkletURI;
 
-// Copy to clipboard functionality
-document.getElementById('copyBtn').addEventListener('click', function() {
-    const ta = document.getElementById('copyBox');
-    ta.select();
-    ta.setSelectionRange(0, 99999);
-    
-    navigator.clipboard.writeText(ta.value).then(() => {
-        const btn = document.getElementById('copyBtn');
-        btn.textContent = '✅ Copiat!';
-        btn.style.background = '#218838';
-        setTimeout(() => {
-            btn.textContent = '📋 Copia al porta-retalls';
-            btn.style.background = '#28a745';
-        }, 2000);
-    }).catch(() => {
-        document.execCommand('copy');
-        alert('Bookmarklet copiat! Ara crea un marcador nou i enganxa\'l.');
-    });
+document.getElementById('copyBtn').addEventListener('click', function(){
+    const ta=document.getElementById('copyBox'); ta.select(); ta.setSelectionRange(0,99999);
+    navigator.clipboard.writeText(ta.value).then(()=>{
+        const btn=document.getElementById('copyBtn'); btn.textContent='✅ Copiat!'; btn.style.background='#218838';
+        setTimeout(()=>{btn.textContent='📋 Copia al porta-retalls'; btn.style.background='#28a745';},2000);
+    }).catch(()=>{document.execCommand('copy'); alert('Bookmarklet copiat! Ara crea un marcador nou i enganxa\'l.')});
 });
 </script>
 </body>
