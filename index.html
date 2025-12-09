@@ -51,14 +51,12 @@ const FINAL_FETCH_URL = PROXY_URL + GOOGLE_SHEET_URL;
 
 /* ------------------- helper functions ------------------- */
 function getTextColor(bgColor){
-    // Determines if text should be black or white based on HSL lightness (L)
     const m = bgColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
     if(!m) return '#fff';
     return (+m[3]) > 55 ? '#000' : '#fff';
 }
 
 function generateGroupColors(groups){
-    // Generates distinct HSL colors based on the number of groups
     const map = {};
     const total = groups.length;
     groups.forEach((g,i)=>{
@@ -75,7 +73,7 @@ function generateGroupColors(groups){
     try{
         // 1. Fetch CSV to determine groups for color generation
         const resp = await fetch(FINAL_FETCH_URL);
-        // Using double quotes and escaping the apostrophe in the error message
+        // Escaping the apostrophe in the error message for safety
         if(!resp.ok) throw new Error("No s\\'ha pogut carregar el full de dades. Codi: "+resp.status); 
         const csv = await resp.text();
 
@@ -88,7 +86,6 @@ function generateGroupColors(groups){
         fetchedColorMap = generateGroupColors(groups);
     }catch(e){
         console.error(e);
-        // Default color map in case of fetch failure
         fetchedColorMap = { default:{ main:'hsl(210,70%,50%)', hover:'hsl(210,80%,40%)' } };
     }
 
