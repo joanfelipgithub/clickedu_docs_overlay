@@ -1,182 +1,112 @@
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Clickedu – Bookmarklet corregit</title>
-<style>
-body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f5f5; color: #333; line-height: 1.6; }
-.container { max-width: 720px; margin: auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-.bookmarklet { display: inline-block; background: #ff6b35; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 1rem; cursor: move; font-size: 16px; box-shadow: 0 2px 8px rgba(255,107,53,0.3); transition: all 0.2s; }
-.bookmarklet:hover { background: #e55a28; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,107,53,0.4); }
-#copyBox { width: 100%; padding: 0.8rem; font-size: 0.85rem; margin-top: 0.5rem; box-sizing: border-box; border: 2px solid #ddd; border-radius: 4px; font-family: monospace; background: #f9f9f9; }
-#copyBtn { margin-top: 0.5rem; padding: 8px 16px; background: #28a745; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
-#copyBtn:hover { background: #218838; }
-.instruction { background: #e3f2fd; padding: 1rem; border-left: 4px solid #2196f3; margin: 1rem 0; border-radius: 4px; }
-hr { margin: 2rem 0; border: none; border-top: 2px solid #eee; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clickedu – Bookmarklet v10 (ultra estable)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f5f5; color: #333; line-height: 1.6; }
+    .container { max-width: 720px; margin: auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .bookmarklet { display: inline-block; background: #ff6b35; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 1rem; cursor: move; font-size: 16px; box-shadow: 0 2px 8px rgba(255,107,53,0.3); transition: all 0.2s; }
+    .bookmarklet:hover { background: #e55a28; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,107,53,0.4); }
+    #copyBox { width: 100%; padding: 0.8rem; font-size: 0.85rem; margin-top: .5rem; box-sizing: border-box; border: 2px solid #ddd; border-radius: 4px; font-family: monospace; background: #f9f9f9; }
+    #copyBtn { margin-top: .5rem; padding: 8px 16px; background: #28a745; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background .2s; }
+    #copyBtn:hover { background: #218838; }
+    .instruction { background: #e3f2fd; padding: 1rem; border-left: 4px solid #2196f3; margin: 1rem 0; border-radius: 4px; }
+  </style>
 </head>
 <body>
 <div class="container">
-<h1>📂 Clickedu – Finestra de documents (versió corregida)</h1>
+  <h1>📂 Clickedu – Bookmarklet V10 (ultra robust)</h1>
 
-<div class="instruction">
-<p><strong>1️⃣ Arrossega el botó taronja a la barra de marcadors</strong></p>
-</div>
+  <div class="instruction">
+    <p><strong>1️⃣ Arrossega el botó taronja a la barra de marcadors</strong></p>
+  </div>
 
-<div style="text-align:center; padding:20px; background:#fafafa; border-radius:8px; margin:1rem 0;">
-<a class="bookmarklet" id="bookmarkletLink" href="#">📂 Docs Clickedu</a>
-</div>
+  <div style="text-align:center; padding:20px; background:#fafafa; border-radius:8px; margin:1rem 0;">
+    <a class="bookmarklet" id="bookmarkletLink" href="#">📂 Docs Clickedu</a>
+  </div>
 
-<div class="instruction">
-<p><strong>2️⃣ Alternativa: Copia el codi</strong></p>
-</div>
+  <div class="instruction">
+    <p><strong>2️⃣ O copia el codi manualment:</strong></p>
+  </div>
 
-<textarea id="copyBox" rows="4" readonly></textarea>
-<button id="copyBtn">📋 Copia</button>
-
+  <textarea id="copyBox" rows="4" readonly></textarea>
+  <button id="copyBtn">📋 Copia</button>
 </div>
 
 <script>
-const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByShDyfz4ShoweV80QWuoQ7wWSzZUORQ/export?format=csv&gid=0";
-const PROXY_URL = "https://cors.eu.org/";
-const FINAL_FETCH_URL = PROXY_URL + GOOGLE_SHEET_URL;
+// Constants
+const SHEET = "https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByShDyfz4ShoweV80QWuoQ7wWSzZUORQ/export?format=csv&gid=0";
+const PROXY = "https://cors.eu.org/";
+const FINAL = PROXY + SHEET;
 
-function generateGroupColors(groups) {
-  const map = {};
-  const total = groups.length;
-  groups.forEach((g, i) => {
-    const hue = Math.floor((i / total) * 360);
+// Utility: assign colors deterministically
+function genColors(groups){
+  const map={};
+  groups.forEach((g,i)=>{
+    const hue = Math.floor((i/groups.length)*360);
     map[g] = {
-      main: `hsl(${hue},70%,50%)`,
-      hover: `hsl(${hue},80%,40%)`
+      main: "hsl("+hue+",70%,50%)",
+      hover:"hsl("+hue+",80%,40%)"
     };
   });
   return map;
 }
 
-(async function buildBookmarklet() {
-  let fetchedColorMap = {};
-  try {
-    const resp = await fetch(FINAL_FETCH_URL);
-    if (!resp.ok) throw new Error("Error carregant CSV");
-    const csv = await resp.text();
-    const lines = csv.split("\n").slice(1);
+// Build bookmarklet (NO template literals inside)
+(async function(){
+  let colormap = {};
 
-    const groups = Array.from(new Set(
-      lines
-        .filter(l => l.trim())
-        .map(l => l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)[0].trim())
-        .filter(g => g)
-    ));
+  try{
+    const raw = await fetch(FINAL);
+    const text = await raw.text();
+    const lines = text.split("\n").slice(1);
+    const groups = [...new Set(lines.filter(l=>l.trim()).map(l=>l.split(",")[0].trim()))];
+    colormap = genColors(groups);
+  }catch(e){ colormap = {default:{main:"hsl(210,70%,50%)",hover:"hsl(210,80%,40%)"}}; }
 
-    fetchedColorMap = generateGroupColors(groups);
-  } catch (e) {
-    console.error(e);
-    fetchedColorMap = { default: { main: "hsl(210,70%,50%)", hover: "hsl(210,80%,40%)" } };
-  }
+  // IMPORTANT: NO backticks inside the bookmarklet code
+  const script =
+    "(function(){"+
+      "if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){alert('⚠️ Aquest bookmarklet només funciona a la pàgina links.');return;}"+
+      "const MAP="+JSON.stringify(colormap)+";"+
+      "function txt(c){var m=c.match(/hsl\\((\\d+),\\s*(\\d+)%,\\s*(\\d+)%\\)/);return m&&(parseInt(m[3])>55)?'#000':'#fff';}"+
+      "var f=document.evaluate('//form[@action=\\"https://shorturl.at/anS1H\\"]',document,null,9,null).singleNodeValue;"+
+      "var blk=f?f.closest('.bloc-info-sumari'):null; if(blk) blk.style.display='none';"+
 
-  const bookmarkletCode = `
-    (async function(){
-      if(!location.href.includes("insscf.clickedu.eu/sumari/index.php?p=links")){
-        alert("⚠️ Aquest bookmarklet només funciona a la pàgina 'links' de Clickedu.");
-        return;
-      }
+      "var b=document.createElement('button');"+
+      "b.textContent='📂 Mostrar documents';"+
+      "Object.assign(b.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer'});"+
+      "document.body.appendChild(b);"+
 
-      const COLOR_MAP = ${JSON.stringify(fetchedColorMap)};
+      "var open=false,ov=null;"+
+      "b.onclick=function(){"+
+        "if(open){ov.remove();open=false;return;}open=true;"+
+        "ov=document.createElement('div');"+
+        "Object.assign(ov.style,{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'rgba(0,0,0,0.85)',zIndex:9998,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',overflowY:'auto',padding:'20px'});"+
+        "document.body.appendChild(ov);"+
 
-      function getTextColor(bg){
-        const m = bg.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-        if(!m) return "#fff";
-        return (+m[3]) > 55 ? "#000" : "#fff";
-      }
+        "var load=document.createElement('div');load.textContent='⏳ Carregant...';load.style.color='white';load.style.fontSize='22px';ov.appendChild(load);"+
 
-      const form = document.evaluate('//form[@action="https://shorturl.at/anS1H"]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-      const block = form?.closest('.bloc-info-sumari');
-      if(block) block.style.display = 'none';
+        "fetch('"+FINAL+"').then(r=>r.text()).then(t=>{"+
+          "var rows=t.split('\\n').slice(1);"+
+          "var docs=rows.filter(l=>l.trim()).map(l=>l.split(/,(?=(?:(?:[^\\"]*\\"){2})*[^\\"]*$)/).map(v=>v.replace(/^\\"|\\"$/g,'').trim())).filter(p=>p.length>=3).map(p=>({g:p[0],l:p[1],u:p[2]}));"+
+          "ov.removeChild(load);"+
 
-      const toggleBtn = document.createElement('button');
-      toggleBtn.textContent = '📂 Mostrar documents';
-      Object.assign(toggleBtn.style, {
-        position: 'fixed', top: '10px', right: '10px', zIndex: 9999,
-        padding: '10px 15px', background: '#007bff', color: '#fff',
-        border: 'none', borderRadius: '8px', cursor: 'pointer'
-      });
-      document.body.appendChild(toggleBtn);
+          "var grid=document.createElement('div');Object.assign(grid.style,{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:'15px',width:'90%',maxWidth:'1200px'});ov.appendChild(grid);"+
 
-      let open = false;
-      let overlay = null;
+          "docs.forEach(function(d){var bt=document.createElement('button');bt.textContent=d.l;var c=MAP[d.g]||MAP.default;Object.assign(bt.style,{padding:'15px',fontSize:'16px',borderRadius:'10px',border:'none',cursor:'pointer',background:c.main,color:txt(c.main)});bt.onmouseover=function(){bt.style.background=c.hover;bt.style.color=txt(c.hover);};bt.onmouseout=function(){bt.style.background=c.main;bt.style.color=txt(c.main);};bt.onclick=function(){window.open(d.u,'_blank');};grid.appendChild(bt);});"+
+        "}).catch(err=>{load.textContent='❌ Error: '+err;load.style.color='#ff6b6b';});"+
+      "};"+
+    "})();";
 
-      toggleBtn.onclick = async () => {
-        if(open){ overlay.remove(); open=false; return; }
-        open = true;
-
-        overlay = document.createElement('div');
-        Object.assign(overlay.style, {
-          position:'fixed', top:0, left:0, width:'100%', height:'100%',
-          background:'rgba(0,0,0,0.8)', zIndex:9998, display:'flex',
-          flexDirection:'column', alignItems:'center', justifyContent:'center',
-          overflowY:'auto', padding:'20px'
-        });
-        document.body.appendChild(overlay);
-
-        const loading = document.createElement('div');
-        loading.textContent = '⏳ Carregant documents...';
-        loading.style.color = 'white';
-        loading.style.fontSize = '20px';
-        overlay.appendChild(loading);
-
-        try{
-          const r = await fetch('${FINAL_FETCH_URL}');
-          if(!r.ok) throw new Error('Error de càrrega');
-          const text = await r.text();
-          const rows = text.split('\n').slice(1);
-
-          const docs = rows
-            .filter(l => l.trim())
-            .map(l => l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').trim()))
-            .filter(p => p.length >= 3)
-            .map(p => ({ g:p[0], l:p[1], u:p[2] }));
-
-          loading.remove();
-
-          const grid = document.createElement('div');
-          Object.assign(grid.style, {
-            display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(250px, 1fr))',
-            gap:'15px', width:'90%', maxWidth:'1200px'
-          });
-
-          docs.forEach(d => {
-            const docBtn = document.createElement('button');
-            docBtn.textContent = d.l;
-            const col = COLOR_MAP[d.g] || COLOR_MAP.default;
-            Object.assign(docBtn.style, {
-              padding:'15px', fontSize:'16px', borderRadius:'10px',
-              border:'none', cursor:'pointer', background:col.main,
-              color:getTextColor(col.main)
-            });
-            docBtn.onmouseover = () => { docBtn.style.background = col.hover; docBtn.style.color = getTextColor(col.hover);} ;
-            docBtn.onmouseout  = () => { docBtn.style.background = col.main;  docBtn.style.color = getTextColor(col.main);} ;
-            docBtn.onclick = () => window.open(d.u, '_blank');
-            grid.appendChild(docBtn);
-          });
-
-          overlay.appendChild(grid);
-        } catch(err) {
-          loading.textContent = '❌ Error carregant documents: ' + err.message;
-          loading.style.color = '#ff6b6b';
-        }
-      };
-    })();
-  `;
-
-  const finalURI = "javascript:" + encodeURI(bookmarkletCode);
-
+  const finalURI = "javascript:" + script;
   document.getElementById("bookmarkletLink").href = finalURI;
   document.getElementById("copyBox").value = finalURI;
 })();
 
-// Copy button
+// Copy to clipboard
 const btn = document.getElementById("copyBtn");
 btn.onclick = () => {
   const ta = document.getElementById("copyBox");
@@ -184,10 +114,7 @@ btn.onclick = () => {
   navigator.clipboard.writeText(ta.value).then(() => {
     btn.textContent = "✅ Copiat!";
     btn.style.background = "#218838";
-    setTimeout(()=>{
-      btn.textContent = "📋 Copia";
-      btn.style.background = "#28a745";
-    },2000);
+    setTimeout(()=>{btn.textContent="📋 Copia";btn.style.background="#28a745";},2000);
   });
 };
 </script>
