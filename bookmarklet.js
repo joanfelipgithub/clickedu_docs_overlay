@@ -17,7 +17,7 @@
   }
 
   const btn = document.createElement("button");
-  btn.textContent = "📂 Mostrar documents";
+  btn.textContent = "📂 Veure Documents";
   Object.assign(btn.style, {
     position: "fixed", top: "10px", right: "10px", zIndex: 9999,
     padding: "10px 15px", background: "#007bff", color: "#fff",
