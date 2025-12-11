@@ -3,7 +3,7 @@
   console.log("Clickedu Docs Overlay – loading…");
 
   if (!location.href.includes("insscf.clickedu.eu/sumari/index.php?p=links")) {
-    alert("⚠️ Aquest bookmarklet només funciona a la secció Passarel·les dins de Sumari");
+    alert("⚠️ Aquest bookmarklet només funciona al Clickedu, a la secció Passarel·les dins de Sumari");
     return;
   }
 
