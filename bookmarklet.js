@@ -217,7 +217,18 @@
     try {
       logSecurity('info', 'Fetching documents from Google Sheets...');
       
-      const response = await fetch(SHEET_URL + "&_=" + Date.now());
+      // Enhanced cache-busting: timestamp + random number
+      const cacheBuster = `&_=${Date.now()}&r=${Math.random()}`;
+      
+      const response = await fetch(SHEET_URL + cacheBuster, {
+        cache: 'no-store', // Force no caching
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+      
       if (!response.ok) throw new Error("HTTP " + response.status);
       
       const csv = await response.text();
@@ -345,6 +356,31 @@
   function buildUI(groups, overlay) {
     const container = document.createElement("div");
     Object.assign(container.style, { width:"100%", maxWidth:"1200px", marginTop:"20px" });
+    
+    // Add refresh button for maintainers
+    const refreshBtn = document.createElement("button");
+    refreshBtn.innerHTML = "🔄 Recarregar";
+    Object.assign(refreshBtn.style, {
+      padding: "10px 20px",
+      fontSize: "14px",
+      cursor: "pointer",
+      borderRadius: "8px",
+      border: "none",
+      background: "#28a745",
+      color: "#fff",
+      boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+      transition: "background 0.2s",
+      marginBottom: "15px",
+      fontWeight: "bold"
+    });
+    refreshBtn.onmouseover = () => refreshBtn.style.background = "#218838";
+    refreshBtn.onmouseout = () => refreshBtn.style.background = "#28a745";
+    refreshBtn.onclick = () => {
+      // Clear the overlay content and reload
+      closeOverlay();
+      setTimeout(() => openOverlay(), 100);
+    };
+    container.appendChild(refreshBtn);
     
     for(const groupName in groups){
       const docs = groups[groupName];
