@@ -2,169 +2,65 @@
 <html lang="ca">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clickedu – bookmarklet per la finestra de Documents</title>
+  <title>ClickEdu Overlay – Instal·lació Bookmarklet</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 2rem;
-      background: #f5f5f5;
-      color: #333;
-      line-height: 1.6;
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f9; color: #333; padding: 40px; }
+    h1 { color: #007bff; display: flex; align-items: center; gap: 10px; }
+    h1 span { font-size: 2rem; }
+    .section { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+    a.bookmarklet { 
+      display: inline-block; 
+      background: #28a745; 
+      color: #fff; 
+      padding: 15px 25px; 
+      text-decoration: none; 
+      border-radius: 10px; 
+      font-weight: bold; 
+      font-size: 16px; 
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+      transition: background 0.2s, transform 0.1s;
     }
-    .container {
-      max-width: 720px;
-      margin: auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .bookmarklet {
-      display: inline-block;
-      background: #ff6b35;
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-      margin-top: 1rem;
-      cursor: move;
-      font-size: 16px;
-      box-shadow: 0 2px 8px rgba(255,107,53,0.3);
-      transition: all 0.2s;
-    }
-    .bookmarklet:hover {
-      background: #e55a28;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255,107,53,0.4);
-    }
-    #copyBox {
-      width: 100%;
-      padding: 0.8rem;
-      font-size: 0.85rem;
-      margin-top: 0.5rem;
-      box-sizing: border-box;
-      border: 2px solid #ddd;
-      border-radius: 4px;
-      font-family: monospace;
-      background: #f9f9f9;
-    }
-    #copyBtn {
-      margin-top: 0.5rem;
-      padding: 8px 16px;
-      background: #28a745;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
-    #copyBtn:hover {
-      background: #218838;
-    }
-    .instruction {
-      background: #e3f2fd;
-      padding: 1rem;
-      border-left: 4px solid #2196f3;
-      margin: 1rem 0;
-      border-radius: 4px;
-    }
-    .warning {
-      background: #fff3cd;
-      padding: 1rem;
-      border-left: 4px solid #ffc107;
-      margin: 1rem 0;
-      border-radius: 4px;
-      font-size: 0.9rem;
-    }
-    hr {
-      margin: 2rem 0;
-      border: none;
-      border-top: 2px solid #eee;
-    }
+    a.bookmarklet:hover { background: #218838; transform: translateY(-2px); }
+    pre { background: #e9ecef; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 14px; }
+    ul { margin: 0; padding-left: 20px; }
+    li { margin-bottom: 10px; }
+    .icon { font-size: 1.5rem; margin-right: 8px; }
   </style>
 </head>
 <body>
-<div class="container">
-  <h1>📂 Clickedu – Finestra de documents</h1>
+  <h1><span>📂</span> ClickEdu Overlay</h1>
 
-  <div class="instruction">
-    <p><strong>1️⃣ Arrossega el botó taronja de sota a la barra de marcadors del teu navegador</strong></p>
-    <p>Això desa un bookmarklet que s'executarà a Clickedu per mostrar els teus documents en una finestra molt pràctica.</p>
+  <div class="section">
+    <h2>1️⃣ Afegir el bookmarklet (Drag & Drop)</h2>
+    <p>Arrossega aquest botó directament a la teva barra de marcadors del navegador:</p>
+    <a class="bookmarklet" href="javascript:(function(){var s=document.createElement('script');s.src='https://joanfelipgithub.github.io/clickedu_docs_overlay/bookmarklet.js?'+Date.now();document.body.appendChild(s);})();">📌 ClickEdu Overlay</a>
+    <p style="margin-top:10px; color:#555;">✅ Aquesta opció és la més fàcil i ràpida.</p>
   </div>
 
-  <div style="text-align: center; padding: 20px; background: #fafafa; border-radius: 8px; margin: 1rem 0;">
-    <a class="bookmarklet" id="bookmarkletLink" href="#">
-      📂 Docs Clickedu
-    </a>
-    <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
-      ⬆️ Arrossega aquest botó a la barra de marcadors
-    </p>
+  <div class="section">
+    <h2>2️⃣ Copiar manualment el codi</h2>
+    <p>Si no pots arrossegar l’enllaç, crea un nou marcador i enganxa aquest codi a l’URL:</p>
+    <pre>javascript:(function(){
+  var s=document.createElement('script');
+  s.src='https://joanfelipgithub.github.io/clickedu_docs_overlay/bookmarklet.js?'+Date.now();
+  document.body.appendChild(s);
+})();</pre>
+    <p style="margin-top:10px; color:#555;">✅ Només cal donar-li el nom “ClickEdu Overlay”.</p>
   </div>
 
-  <div class="instruction">
-    <p><strong>2️⃣ Alternativa: Copia al porta-retalls</strong></p>
-    <p>Si arrossegar no funciona (mòbil o restriccions del navegador), fes clic al botó Copia de sota, després crea un marcador nou manualment i enganxa l'URL.</p>
-  </div>
-
-  <textarea id="copyBox" rows="4" readonly></textarea>
-  <button id="copyBtn">📋 Copia al porta-retalls</button>
-
-  <div class="warning">
-    <p><strong>⚠️ Estructura del Google Sheet:</strong></p>
-    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
-      <li><strong>Columna A:</strong> Categoria/Grup (per agrupar documents)</li>
-      <li><strong>Columna B:</strong> Nom del document (botó)</li>
-      <li><strong>Columna C:</strong> URL del document</li>
-      <li>La primera fila (capçaleres) es descarta automàticament</li>
+  <div class="section">
+    <h2>3️⃣ Ús del bookmarklet</h2>
+    <ul>
+      <li><span class="icon">🌐</span> Navega a la secció Passarel·les dins de Sumari a ClickEdu.</li>
+      <li><span class="icon">📂</span> Fes clic al marcador “ClickEdu Overlay”.</li>
+      <li><span class="icon">⚡</span> Apareixerà l’overlay amb els documents carregats automàticament des del Google Sheet.</li>
+      <li><span class="icon">❌</span> Clica fora de l’overlay o pressiona <strong>Escape</strong> per tancar-lo.</li>
     </ul>
   </div>
 
-  <hr>
-  
-  <p style="font-size: 0.9rem; color: #666;">
-    <strong>ℹ️ Com funciona:</strong> Els documents es carreguen automàticament des del Google Sheet agrupats per categories. Cada categoria és plegable per facilitar la navegació.
-  </p>
-  
-  <p style="font-size: 0.9rem; color: #666;">
-    <strong>📊 Google Sheet:</strong> <a href="https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByShDyfz4ShoweV80QWuoQ7wWSzZUORQ/edit" target="_blank">Editar el full de càlcul</a>
-  </p>
-</div>
-
-<script>
-// Google Sheets CSV export URL
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByShDyfz4ShoweV80QWuoQ7wWSzZUORQ/export?format=csv&gid=0';
-
-// The bookmarklet code with collapsible groups - FIXED VERSION with display:none
-const bookmarkletCode = `javascript:(async function(){if(!location.href.includes('insscf.clickedu.eu/sumari/index.php?p=links')){alert('⚠️ Aquest bookmarklet només funciona a la secció Passarel·les dins de Sumari');return;}let formNode=null,containerNode=null;const formXPath='//form[@action="https://shorturl.at/anS1H"]';formNode=document.evaluate(formXPath,document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;if(formNode){containerNode=formNode.closest('.bloc-info-sumari');if(containerNode){containerNode.style.display='none';}else{formNode.style.display='none';}}const btn=document.createElement('button');btn.textContent='📂 Mostrar documents';Object.assign(btn.style,{position:'fixed',top:'10px',right:'10px',zIndex:9999,padding:'10px 15px',background:'#007bff',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',boxShadow:'0 2px 4px rgba(0,0,0,.2)',transition:'background .2s,opacity .3s',fontWeight:'bold',opacity:'1'});btn.onmouseover=()=>btn.style.background='#0056b3';btn.onmouseout=()=>btn.style.background='#007bff';document.body.appendChild(btn);let overlayVisible=!1;btn.onclick=async function(){if(containerNode){containerNode.style.display='none'}else if(formNode){formNode.style.display='none'}if(overlayVisible){closeOverlay();btn.style.opacity='1';return}overlayVisible=!0;btn.style.opacity='0.2';const overlay=document.createElement('div');Object.assign(overlay.style,{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'rgba(0,0,0,0.85)',zIndex:9998,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-start',padding:'20px',overflowY:'auto'});overlay.addEventListener('click',e=>{if(e.target===overlay)closeOverlay()});document.addEventListener('keydown',esc);function esc(e){if(e.key==='Escape')closeOverlay()}function closeOverlay(){overlay.remove();document.removeEventListener('keydown',esc);overlayVisible=!1;btn.style.opacity='1'}const loadingMsg=document.createElement('div');loadingMsg.textContent='⏳ Carregant documents des del Google Sheet...';Object.assign(loadingMsg.style,{color:'white',fontSize:'18px',marginBottom:'20px',textAlign:'center',marginTop:'50px'});overlay.appendChild(loadingMsg);document.body.appendChild(overlay);try{const csvUrl='${SHEET_CSV_URL}';const response=await fetch(csvUrl,{cache:'no-cache'});if(!response.ok)throw new Error(\`HTTP \${response.status}\`);const csvText=await response.text();function parseCSVLine(line){const result=[];let current='';let inQuotes=!1;for(let i=0;i<line.length;i++){const char=line[i];const nextChar=line[i+1];if(char==='"'){if(inQuotes&&nextChar==='"'){current+='"';i++}else{inQuotes=!inQuotes}}else if(char===','&&!inQuotes){result.push(current.trim());current=''}else{current+=char}}result.push(current.trim());return result}const lines=csvText.split('\\n').filter(line=>line.trim());const groupedDocs={};for(let i=1;i<lines.length;i++){const parts=parseCSVLine(lines[i]);if(parts.length>=3){const group=parts[0].replace(/^"+|"+$/g,'').trim();const label=parts[1].replace(/^"+|"+$/g,'').trim();const url=parts[2].replace(/^"+|"+$/g,'').trim();if(group&&label&&url){if(!groupedDocs[group])groupedDocs[group]=[];groupedDocs[group].push({l:label,u:url})}}}loadingMsg.remove();if(Object.keys(groupedDocs).length===0){const errorMsg=document.createElement('div');errorMsg.textContent='⚠️ No s\\'han trobat documents vàlids al Google Sheet';Object.assign(errorMsg.style,{color:'#ffc107',fontSize:'18px',textAlign:'center'});overlay.appendChild(errorMsg);return}const container=document.createElement('div');Object.assign(container.style,{width:'100%',maxWidth:'1200px',marginTop:'20px'});for(const[groupName,docs]of Object.entries(groupedDocs)){const groupSection=document.createElement('div');Object.assign(groupSection.style,{marginBottom:'15px',background:'rgba(255,255,255,0.1)',borderRadius:'12px',overflow:'hidden'});const groupHeader=document.createElement('div');groupHeader.textContent='▼ '+groupName+' ('+docs.length+')';Object.assign(groupHeader.style,{padding:'15px 20px',background:'rgba(0,123,255,0.8)',color:'white',fontSize:'18px',fontWeight:'bold',cursor:'pointer',userSelect:'none',transition:'background 0.2s'});groupHeader.onmouseover=()=>groupHeader.style.background='rgba(0,123,255,1)';groupHeader.onmouseout=()=>groupHeader.style.background='rgba(0,123,255,0.8)';const groupContent=document.createElement('div');Object.assign(groupContent.style,{display:'none',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:'10px',padding:'0'});let isOpen=!1;groupHeader.onclick=()=>{isOpen=!isOpen;if(isOpen){groupContent.style.display='grid';groupContent.style.padding='15px';groupHeader.textContent='▲ '+groupName+' ('+docs.length+')'}else{groupContent.style.display='none';groupContent.style.padding='0';groupHeader.textContent='▼ '+groupName+' ('+docs.length+')'}};docs.forEach(doc=>{const docBtn=document.createElement('button');docBtn.textContent=doc.l;Object.assign(docBtn.style,{padding:'12px',fontSize:'14px',cursor:'pointer',borderRadius:'8px',border:'none',background:'#007bff',color:'#fff',boxShadow:'0 2px 4px rgba(0,0,0,0.2)',transition:'background .2s',textAlign:'left'});docBtn.onmouseover=()=>docBtn.style.background='#0056b3';docBtn.onmouseout=()=>docBtn.style.background='#007bff';docBtn.onclick=()=>window.open(doc.u,'_blank');groupContent.appendChild(docBtn)});groupSection.appendChild(groupHeader);groupSection.appendChild(groupContent);container.appendChild(groupSection)}overlay.appendChild(container)}catch(err){loadingMsg.textContent='❌ Error: '+err.message+'\\n\\nAssegura\\'t que el Google Sheet està publicat correctament.';loadingMsg.style.color='#ff6b6b';console.error('Error carregant documents:',err)}};})();`;
-
-// Set the href using JavaScript
-document.getElementById('bookmarkletLink').href = bookmarkletCode;
-
-// Set the textarea content
-document.getElementById('copyBox').value = bookmarkletCode;
-
-// Copy to clipboard functionality
-document.getElementById('copyBtn').addEventListener('click', function() {
-  const ta = document.getElementById('copyBox');
-  ta.select();
-  ta.setSelectionRange(0, 99999);
-  
-  navigator.clipboard.writeText(ta.value).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✅ Copiat!';
-    btn.style.background = '#218838';
-    setTimeout(() => {
-      btn.textContent = '📋 Copia al porta-retalls';
-      btn.style.background = '#28a745';
-    }, 2000);
-  }).catch(() => {
-    document.execCommand('copy');
-    alert('Bookmarklet copiat! Ara crea un marcador nou i enganxa\'l.');
-  });
-});
-</script>
+  <div class="section" style="text-align:center;">
+    <h2>💡 Consell PRO+</h2>
+    <p>El bookmarklet sempre carregarà la darrera versió del script des del GitHub, així que només cal actualitzar <strong>bookmarklet.js</strong> si es fan canvis.</p>
+  </div>
 </body>
 </html>
