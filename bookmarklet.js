@@ -146,6 +146,7 @@
     });
     overlay.addEventListener("click", e => { if (e.target === overlay) closeOverlay(); });
     document.addEventListener("keydown", escClose);
+    document.addEventListener("keydown", openSheetsShortcut);
 
     const loadingMsg = document.createElement("div");
     loadingMsg.textContent = "⏳ Carregant documents des del Google Sheet…";
@@ -160,11 +161,55 @@
     const overlay = document.getElementById("docsOverlay");
     if (overlay) overlay.remove();
     document.removeEventListener("keydown", escClose);
+    document.removeEventListener("keydown", openSheetsShortcut);
     overlayVisible = false;
     btn.style.opacity = "1";
   }
 
   function escClose(e) { if (e.key === "Escape") closeOverlay(); }
+
+  function openSheetsShortcut(e) {
+    // Ctrl+Shift+S to open Google Sheets for maintenance
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      const SHEET_EDIT_URL = "https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByShDyfz4ShoweV80QWuoQ7wWSzZUORQ/edit";
+      window.open(SHEET_EDIT_URL, '_blank');
+      logSecurity('info', 'User opened Google Sheets for maintenance via Ctrl+Shift+S');
+      
+      // Optional: Show a brief notification
+      showTemporaryNotification("📝 S'ha obert el Google Sheet per a edició");
+    }
+  }
+
+  function showTemporaryNotification(message) {
+    const notification = document.createElement("div");
+    notification.textContent = message;
+    Object.assign(notification.style, {
+      position: "fixed",
+      top: "70px",
+      right: "10px",
+      background: "#28a745",
+      color: "#fff",
+      padding: "12px 20px",
+      borderRadius: "8px",
+      boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
+      zIndex: 10000,
+      fontSize: "14px",
+      fontWeight: "bold",
+      opacity: "0",
+      transition: "opacity 0.3s"
+    });
+    document.body.appendChild(notification);
+    
+    // Fade in
+    setTimeout(() => notification.style.opacity = "1", 10);
+    
+    // Fade out and remove after 2 seconds
+    setTimeout(() => {
+      notification.style.opacity = "0";
+      setTimeout(() => notification.remove(), 300);
+    }, 2000);
+  }
 
   async function loadDocs(overlay, loadingMsg) {
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/1iAF3p81G8DdByShDyfz4ShoweV80QWuoQ7wWSzZUORQ/export?format=csv&gid=0";
