@@ -24,7 +24,10 @@
     warnOnExternal: true,
     
     // Log security events to console
-    enableSecurityLogging: true
+    enableSecurityLogging: true,
+    
+    // Use CORS proxy if direct fetch fails (set to false by default)
+    useCorsProxy: false
   };
 
   // ============================================================================
@@ -217,21 +220,13 @@
     try {
       logSecurity('info', 'Fetching documents from Google Sheets...');
       
-      // Enhanced cache-busting: timestamp + random number
-      const cacheBuster = `&_=${Date.now()}&r=${Math.random()}`;
+      // Use XMLHttpRequest instead of fetch - better for CORS with Google Sheets
+      const csv = await loadCSVviaXHR(SHEET_URL);
       
-      const response = await fetch(SHEET_URL + cacheBuster, {
-        cache: 'no-store', // Force no caching
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
-      });
-      
-      if (!response.ok) throw new Error("HTTP " + response.status);
-      
-      const csv = await response.text();
+      // Check if we actually got CSV data
+      if (!csv || csv.trim().length === 0) {
+        throw new Error("El Google Sheet està buit o no és accessible");
+      }
       
       // Parse and validate CSV
       const docs = parseCSV(csv);
@@ -254,10 +249,68 @@
       logSecurity('info', `Loaded ${countDocs(validatedDocs.valid)} valid documents`);
       
     } catch (err) {
-      loadingMsg.textContent = "❌ Error: " + err.message + "\n\nComprova el Google Sheet.";
-      loadingMsg.style.color = "#ff6b6b";
-      console.error(err);
+      loadingMsg.remove();
+      
+      // Detailed error message
+      const errorBox = document.createElement("div");
+      Object.assign(errorBox.style, {
+        background: "rgba(255,107,107,0.2)",
+        border: "2px solid #ff6b6b",
+        borderRadius: "12px",
+        padding: "20px",
+        maxWidth: "600px",
+        color: "#fff"
+      });
+      
+      errorBox.innerHTML = `
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 15px;">
+          ❌ Error al carregar els documents
+        </div>
+        <div style="margin-bottom: 15px;">
+          <strong>Detall de l'error:</strong><br>
+          ${err.message}
+        </div>
+        <div style="font-size: 14px; line-height: 1.6;">
+          <strong>Possibles causes:</strong>
+          <ul style="margin: 10px 0; padding-left: 20px;">
+            <li>El Google Sheet no és públic (ha de ser "Qualsevol persona amb l'enllaç")</li>
+            <li>Problema de xarxa o firewall</li>
+            <li>L'ID del Google Sheet és incorrecte</li>
+            <li>CORS (Cross-Origin) està bloquejant la petició</li>
+          </ul>
+          <strong>Prova aquestes solucions:</strong>
+          <ol style="margin: 10px 0; padding-left: 20px;">
+            <li>Verifica que el Google Sheet sigui accessible <a href="${SHEET_URL}" target="_blank" style="color: #4fc3f7;">clicant aquí</a></li>
+            <li>Obre el Google Sheet i configura: Share → "Anyone with the link" → "Viewer"</li>
+            <li>Comprova la consola del navegador (F12) per veure més detalls</li>
+          </ol>
+        </div>
+      `;
+      
+      overlay.appendChild(errorBox);
+      console.error("Full error details:", err);
+      logSecurity('error', `Failed to load documents: ${err.message}`);
     }
+  }
+
+  function loadCSVviaXHR(url) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      const cacheBuster = `${url}${url.includes('?') ? '&' : '?'}_=${Date.now()}`;
+      
+      xhr.open('GET', cacheBuster, true);
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr.responseText);
+        } else {
+          reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
+        }
+      };
+      xhr.onerror = function() {
+        reject(new Error('Failed to fetch: Network error or CORS issue'));
+      };
+      xhr.send();
+    });
   }
 
   function parseCSV(text) {
