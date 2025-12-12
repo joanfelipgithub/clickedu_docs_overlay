@@ -25,42 +25,49 @@
     ul { margin: 0; padding-left: 20px; }
     li { margin-bottom: 10px; }
     .icon { font-size: 1.5rem; margin-right: 8px; }
+    code { background: #e9ecef; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
   </style>
 </head>
 <body>
   <h1><span>📂</span>Docs_InsSCF</h1>
-
+  
   <div class="section">
     <h2>1️⃣ Afegir el bookmarklet (Drag & Drop)</h2>
     <p>Arrossega aquest botó directament a la teva barra de marcadors del navegador:</p>
-    <a class="bookmarklet" href="javascript:(function(){var s=document.createElement('script');s.src='https://joanfelipgithub.github.io/clickedu_docs_overlay/bookmarklet.js?'+Date.now();document.body.appendChild(s);})();">📌DocsINSSCF</a>
-    <p style="margin-top:10px; color:#555;">✅ Aquesta opció és la més fàcil i ràpida.</p>
+    <a class="bookmarklet" href="javascript:(function(){var s=document.createElement('script');s.src='https://joanfelipgithub.github.io/clickedu_docs_overlay/bookmarklet.js?v='+Date.now();document.body.appendChild(s);})();">📌DocsINSSCF</a>
   </div>
-
+  
   <!-- <div class="section">
-    <h2>2️⃣ Copiar manualment el codi</h2>
-    <p>Si no pots arrossegar l’enllaç, crea un nou marcador i enganxa aquest codi a l’URL:</p>
-    <pre>javascript:(function(){
-  var s=document.createElement('script');
-  s.src='https://joanfelipgithub.github.io/clickedu_docs_overlay/bookmarklet.js?'+Date.now();
-  document.body.appendChild(s);
-})();</pre>
-    <p style="margin-top:10px; color:#555;">✅ Només cal donar-li el nom “ClickEdu Overlay”.</p>
+    <h2>2️⃣ Opció alternativa: Copiar manualment</h2>
+    <p>Si arrossegar el botó no funciona al teu navegador, segueix aquests passos:</p>
+    <ol>
+      <li>Crea un nou marcador (Ctrl+D o Cmd+D)</li>
+      <li>Dona-li el nom: <strong>DocsINSSCF</strong></li>
+      <li>Al camp URL, enganxa aquest codi:</li>
+    </ol>
+    <pre>javascript:(function(){var s=document.createElement('script');s.src='https://joanfelipgithub.github.io/clickedu_docs_overlay/bookmarklet.js?v='+Date.now();document.body.appendChild(s);})();</pre>
+    <p style="margin-top:10px; color:#555;">✅ Assegura't de copiar <strong>tot el codi</strong>, incloent <code>javascript:</code> al principi.</p>
   </div> -->
-
+  
   <div class="section">
-    <h2>2️⃣ Ús del bookmarklet</h2>
+    <h2>3️⃣ Ús del bookmarklet</h2>
     <ul>
-      <li><span class="icon">🌐</span> Navega a la secció Passarel·les dins de Sumari a ClickEdu.</li>
-      <li><span class="icon">📂</span> Fes clic al marcador “ClickEdu Overlay”.</li>
-      <li><span class="icon">⚡</span> Apareixerà l’overlay amb els documents carregats automàticament des del Google Sheet.</li>
-      <li><span class="icon">❌</span> Clica fora de l’overlay o pressiona <strong>Escape</strong> per tancar-lo.</li>
+      <li><span class="icon">🌐</span> Navega a la secció <strong>Passarel·les</strong> dins de <strong>Sumari</strong> a ClickEdu.</li>
+      <li><span class="icon">📂</span> Fes clic al marcador <strong>"DocsINSSCF"</strong> a la teva barra de marcadors.</li>
+      <li><span class="icon">⚡</span> Apareixerà l'overlay amb els documents carregats automàticament des del Google Sheet.</li>
+      <li><span class="icon">❌</span> Clica fora de l'overlay o pressiona <strong>Escape</strong> per tancar-lo.</li>
     </ul>
   </div>
-
-  <!-- <div class="section" style="text-align:center;">
-    <h2>💡 Consell PRO+</h2>
-    <p>El bookmarklet sempre carregarà la darrera versió del script des del GitHub, així que només cal actualitzar <strong>bookmarklet.js</strong> si es fan canvis.</p>
+  
+  <!-- <div class="section">
+    <h2>💡 Notes per als administradors</h2>
+    <ul>
+      <li><span class="icon">🔒</span> L'overlay inclou <strong>protecció de seguretat</strong> que bloqueja dominis no autoritzats.</li>
+      <li><span class="icon">⌨️</span> Prem <strong>Ctrl+Shift+S</strong> (amb l'overlay obert) per obrir el Google Sheet i editar-lo.</li>
+      <li><span class="icon">🔄</span> Les actualitzacions del Google Sheet poden trigar <strong>1-5 minuts</strong> a aparèixer per la memòria cau de Google.</li>
+      <li><span class="icon">✅</span> No cal que els usuaris actualitzin el marcador quan facis canvis al codi.</li>
+    </ul>
   </div> -->
+  
 </body>
 </html>
